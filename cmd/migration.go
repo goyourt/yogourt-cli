@@ -2,8 +2,8 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/goyourt/yogourt/cli/config"
-	"github.com/goyourt/yogourt/cli/database"
+	"github.com/goyourt/yogourt-cli/config"
+	"github.com/goyourt/yogourt-cli/database"
 	"log"
 	"os"
 	"os/exec"
