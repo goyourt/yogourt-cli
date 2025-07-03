@@ -71,7 +71,7 @@ paths:
   model_folder: "` + ProjectName + `/models/"
   project_name: "` + ProjectName + `"
   main_file: "` + ProjectName + `/main.go"
-  route_folder: "` + ProjectName + `/routes/"
+  api_folder: "` + ProjectName + `/api/"
 `
 
 	file.WriteString(configFileContent) //Ecriture du contenu dans le fichier config
@@ -142,13 +142,13 @@ func InitProject(ProjectName string) {
 	}
 
 	/* Dossier route - présent dans le dossier principal */
-	RouteFolder := ProjectName + "/routes/"
+	ApiFolder := ProjectName + "/api/"
 
-	routeFolderError := os.Mkdir(RouteFolder, os.ModePerm)
+	apiFolderError := os.Mkdir(ApiFolder, os.ModePerm)
 
-	if routeFolderError != nil {
-		fmt.Printf("Erreur lors de la création du dossier routes: %v \n", routeFolderError)
-		log.Printf("ERROR: %s\n", routeFolderError) // Ecriture des logs
+	if apiFolderError != nil {
+		fmt.Printf("Erreur lors de la création du dossier api: %v \n", apiFolderError)
+		log.Printf("ERROR: %s\n", apiFolderError) // Ecriture des logs
 		return
 	}
 
