@@ -212,7 +212,7 @@ import (
 	"log"
 
 	"github.com/goyourt/yogourt-cli/database"
-	"` + ProjectName + `/models"
+	"github.com/goyourt/yogourt-cli/` + ProjectName + `/models"
 )
 
 func main() {
