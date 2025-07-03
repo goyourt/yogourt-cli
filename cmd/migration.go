@@ -2,11 +2,12 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/goyourt/yogourt-cli/config"
-	"github.com/goyourt/yogourt-cli/database"
 	"log"
 	"os"
 	"os/exec"
+
+	"github.com/goyourt/yogourt-cli/config"
+	"github.com/goyourt/yogourt-cli/database"
 
 	"github.com/spf13/cobra"
 )
@@ -30,7 +31,7 @@ func executeMigration() {
 	InitLogsFile()
 
 	// Vérification et lecture du fichier config
-	cfg, err := config.LoadConfig(ConfigPath)
+	cfg, err := config.LoadConfig("./config.yaml")
 	if err != nil {
 		fmt.Printf(`❌ Fichier config.yaml non trouvé, assurez vous que celui-ci se trouve à la racine de votre projet ou
    que vous avez entré la commande suivante: yogourt init project_name`)
@@ -59,7 +60,7 @@ func migrate(modelName string) {
 	InitLogsFile()
 
 	// Vérification et lecture du fichier config
-	cfg, err := config.LoadConfig(ConfigPath)
+	cfg, err := config.LoadConfig("./config.yaml")
 	if err != nil {
 		fmt.Printf(`❌ Fichier config.yaml non trouvé, assurez vous que celui-ci se trouve à la racine de votre projet ou
    que vous avez entré la commande suivante: yogourt init project_name`)
@@ -76,7 +77,7 @@ func migrate(modelName string) {
 			return
 		} else {
 			// Initialisation BDD
-			database.InitDatabase(ConfigPath)
+			database.InitDatabase("./config.yaml")
 
 			// Migration via le fichier cmd/migrate/main.go
 			executeMigration()

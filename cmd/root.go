@@ -6,8 +6,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var ConfigPath string
-
 var rootCmd = &cobra.Command{
 	Use:   "yogourt",
 	Short: "yogourt CLI",
@@ -15,11 +13,6 @@ var rootCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("Bienvenue dans yogourt !")
 	},
-}
-
-func init() {
-	// Flag global accessible à toutes les commandes
-	rootCmd.PersistentFlags().StringVar(&ConfigPath, "config", "./config.yaml", "Chemin du fichier de configuration")
 }
 
 func Execute() {

@@ -4,12 +4,13 @@ package cmd
 
 import (
 	"fmt"
-	"github.com/goyourt/yogourt-cli/config"
 	"log"
 	"os"
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/goyourt/yogourt-cli/config"
 
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/fatih/color"
@@ -50,7 +51,7 @@ func CreateModel() {
 	InitLogsFile()
 
 	// Vérification et lecture du fichier config
-	cfg, err := config.LoadConfig(ConfigPath)
+	cfg, err := config.LoadConfig("./config.yaml")
 	if err != nil {
 		fmt.Printf(`❌ Fichier config.yaml non trouvé, assurez vous que celui-ci se trouve à la racine de votre projet ou
    que vous avez entré la commande suivante: yogourt init project_name`)
