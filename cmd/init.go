@@ -44,8 +44,8 @@ func CreateConfigFile(ProjectName string) {
 	// Création du fichier config
 	file, configFileError := os.Create(configPath)
 	if configFileError != nil {
-		log.Fatalf("Erreur lors de la création du fichier de config: %v\n", configFileError)
 		log.Printf("ERROR: %s\n", configFileError) // Ecriture des logs
+		log.Fatalf("Erreur lors de la création du fichier de config: %v\n", configFileError)
 		return
 	}
 	defer file.Close()
@@ -68,10 +68,10 @@ database:
   dbname: "mydb"
 
 paths:
-  model_folder: "` + ProjectName + `/models/"
-  project_name: "` + ProjectName + `"
-  main_file: "` + ProjectName + `/main.go"
-  api_folder: "` + ProjectName + `/api/"
+  model_folder: "./models/"
+  project_name: ` + ProjectName + `
+  main_file: "./main.go"
+  api_folder: "./api/"
 `
 
 	file.WriteString(configFileContent) //Ecriture du contenu dans le fichier config
@@ -86,7 +86,7 @@ func createMiddlewareFile(ProjectName string) {
 	InitLogsFile()
 
 	/* Dossier middleware - présent dans le dossier principal */
-	MiddlewareFolder := ProjectName + "/middleware/"
+	MiddlewareFolder := "./middleware/"
 
 	middlewareFolderError := os.Mkdir(MiddlewareFolder, os.ModePerm)
 
@@ -114,7 +114,7 @@ import (
 )
 
 var Callbacks = map[string]func(*gin.Context){
-	"/":          base,
+	"/api":          base,
 }
 
 func base(c *gin.Context) {
@@ -134,15 +134,8 @@ func InitProject(ProjectName string) {
 	// Initialisation du fichier de logs
 	InitLogsFile()
 
-	projectNameError := os.MkdirAll(ProjectName, os.ModePerm)
-	if projectNameError != nil {
-		log.Fatalf("Erreur lors de la création de l'environnement de travail: %v \n", projectNameError)
-		log.Printf("ERROR: %s\n", projectNameError) // Ecriture des logs
-		return
-	}
-
 	/* Dossier route - présent dans le dossier principal */
-	ApiFolder := ProjectName + "/api/"
+	ApiFolder := "./api/"
 
 	apiFolderError := os.Mkdir(ApiFolder, os.ModePerm)
 
@@ -153,7 +146,7 @@ func InitProject(ProjectName string) {
 	}
 
 	/* Dossier model - présent dans le dossier principal */
-	ModelFolder := ProjectName + "/models/"
+	ModelFolder := "./models/"
 
 	modelFolderError := os.Mkdir(ModelFolder, os.ModePerm)
 
@@ -212,7 +205,7 @@ import (
 	"log"
 
 	"github.com/goyourt/yogourt-cli/database"
-	"github.com/goyourt/yogourt-cli/` + ProjectName + `/models"
+	 ProjectName + "/models"
 )
 
 func main() {
