@@ -224,7 +224,7 @@ func main() {
 	file.WriteString(migrationFileContent) //Ecriture du contenu dans le fichier migrate.go
 
 	/* Fichier main - présent dans le dossier principal */
-	MainFile := ProjectName + "/main.go"
+	MainFile := "./main.go"
 
 	file, mainFileError := os.Create(MainFile)
 	if mainFileError != nil {
