@@ -178,7 +178,7 @@ var Models = map[string]interface{}{
 
 	/* --- Création du fichier cmd/migrate.go --- */
 	/* Dossier cmd */
-	CmdFolder := ProjectName + "/cmd/"
+	CmdFolder := "./cmd/"
 
 	cmdFolderError := os.Mkdir(CmdFolder, os.ModePerm)
 
