@@ -9,6 +9,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"unicode"
 
 	"github.com/goyourt/yogourt-cli/config"
 
@@ -69,13 +70,17 @@ func CreateModel() {
 		fmt.Printf("%s ", blue("Quel est le nom du modèle ?\n"))
 		var modelName string
 		fmt.Scanln(&modelName)
-		if modelName == "" || !validName.MatchString(modelName) {
+
+		ModelNamerunes := []rune(modelName)
+		ModelNamerunes[0] = unicode.ToUpper(ModelNamerunes[0])
+
+		if string(ModelNamerunes) == "" || !validName.MatchString(string(ModelNamerunes)) {
 			fmt.Println("❌ Nom invalide, veuillez entrer un nom en lettres uniquement.")
 			log.Printf("ERROR: %s\n", err) // Ecriture des logs
 
 			return
 		} else {
-			fmt.Println(green("Nom du modèle: ", modelName))
+			fmt.Println(green("Nom du modèle: ", string(ModelNamerunes)))
 		}
 
 		// Type d'ID
@@ -107,7 +112,11 @@ func CreateModel() {
 			fmt.Printf("%s ", blue("Quel est le nom de votre champ N°"+strconv.Itoa(i)+" ?\n"))
 			var fieldName string
 			fmt.Scanln(&fieldName)
-			if fieldName == "" || !validName.MatchString(fieldName) {
+
+			FieldNamerunes := []rune(fieldName)
+			FieldNamerunes[0] = unicode.ToUpper(FieldNamerunes[0])
+
+			if string(FieldNamerunes) == "" || !validName.MatchString(string(FieldNamerunes)) {
 				fmt.Println("❌ Nom du champ invalide, veuillez entrer un nom en lettres uniquement.")
 				return
 			}
@@ -130,14 +139,14 @@ func CreateModel() {
 
 			// Ajout du champ dans le slice
 			field := Field{
-				Name:       fieldName,
+				Name:       string(FieldNamerunes),
 				Type:       fieldType,
 				Constraint: fieldConstraint,
 			}
 
 			fields = append(fields, field)
 
-			fmt.Println(green("Champ " + fieldName + " de type " + fieldType + " à été créé avec succès."))
+			fmt.Println(green("Champ " + string(FieldNamerunes) + " de type " + fieldType + " à été créé avec succès."))
 		}
 
 		// Génération du modele
