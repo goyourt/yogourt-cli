@@ -14,6 +14,10 @@ var DB *gorm.DB
 
 // InitDatabase Chargement de la base de données
 func InitDatabase(configPathAdded string) {
+	if DB != nil {
+		return
+	}
+
 	cfg, err := config.LoadConfig(configPathAdded)
 	if err != nil {
 		log.Fatal(err)
