@@ -107,7 +107,7 @@ func createMiddlewareFile(ProjectName string) {
 	}
 	defer file.Close() //Fermeture du fichier config
 
-	middlewareFileContent := `package middleware
+	middlewareFileContent := `package main
 
 import (
 	"github.com/gin-gonic/gin"
@@ -121,6 +121,7 @@ func base(c *gin.Context) {
 	c.Next()
 }
 
+func main() {}
 `
 
 	file.WriteString(middlewareFileContent) //Ecriture du contenu dans le fichier middleware
@@ -205,7 +206,7 @@ import (
 	"log"
 
 	"github.com/goyourt/yogourt-cli/database"
-	 ProjectName + "/models"
+	 ` + ProjectName + ` "/models"
 )
 
 func main() {

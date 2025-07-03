@@ -31,27 +31,18 @@ func executeMigration() {
 	InitLogsFile()
 
 	// Vérification et lecture du fichier config
-	cfg, err := config.LoadConfig("./config.yaml")
-	if err != nil {
-		fmt.Printf(`❌ Fichier config.yaml non trouvé, assurez vous que celui-ci se trouve à la racine de votre projet ou
-   que vous avez entré la commande suivante: yogourt init project_name`)
-		log.Printf("ERROR: %s\n", err) // Ecriture des logs
-		return
-	} else {
 
-		// Définir le chemin du projet de l'utilisateur (chemin vers le projet de l'utilisateur)
-		ProjectName := cfg.Paths.ProjectName
-		pathToUserProject := "./" + ProjectName
+	// Définir le chemin du projet de l'utilisateur (chemin vers le projet de l'utilisateur)
+	pathToUserProject := "./"
 
-		// Crée une commande pour exécuter `go run cmd/migrate/main.go`
-		cmd := exec.Command("go", "run", "./cmd/migrate.go")
-		cmd.Dir = pathToUserProject // Définit le répertoire de travail du projet
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
+	// Crée une commande pour exécuter `go run cmd/migrate/main.go`
+	cmd := exec.Command("go", "run", "./cmd/migrate.go")
+	cmd.Dir = pathToUserProject // Définit le répertoire de travail du projet
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
 
-		// Exécution de la commande
-		cmd.Run()
-	}
+	// Exécution de la commande
+	cmd.Run()
 }
 
 func migrate(modelName string) {
