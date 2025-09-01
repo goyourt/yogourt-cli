@@ -51,10 +51,10 @@ func migrate(modelName string) {
 	InitLogsFile()
 
 	// Vérification et lecture du fichier config
-	cfg, err := config.LoadConfig("./config.yaml")
+	cfg, err := config.LoadConfig()
 	if err != nil {
 		fmt.Printf(`❌ Fichier config.yaml non trouvé, assurez vous que celui-ci se trouve à la racine de votre projet ou
-   que vous avez entré la commande suivante: yogourt init project_name`)
+   			que vous avez entré la commande suivante: yogourt init project_name`)
 		log.Printf("ERROR: %s\n", err) // Ecriture des logs
 		return
 	} else {
@@ -62,13 +62,13 @@ func migrate(modelName string) {
 		// Récupération de la variable d'environnement depuis le fichier config
 		ModelFolder := cfg.Paths.ModelFolder
 
-		if _, err := os.Stat(ModelFolder + "/" + modelName + "Model.go"); os.IsNotExist(err) {
+		if _, err := os.Stat(ModelFolder + "/" + modelName + ".go"); os.IsNotExist(err) {
 			fmt.Println("❌ Aucun modèle trouvé, veuillez créer un modèle avec la commande suivante: yogourt model model_name")
 			log.Printf("ERROR: %s\n", err) // Ecriture des logs
 			return
 		} else {
 			// Initialisation BDD
-			database.InitDatabase("./config.yaml")
+			database.InitDatabase()
 
 			// Migration via le fichier cmd/migrate/main.go
 			executeMigration()

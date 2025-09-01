@@ -1,0 +1,22 @@
+
+app_name: "$ProjectName$"
+version: "1.0.0"
+mode: "development"
+
+server:
+  port: 8080
+  cors: true
+
+database:
+  type: "postgres"
+  user: "admin"
+  password: "password"
+  host: "localhost"
+  port: 5432
+  db: "mydb"
+
+paths:
+  model_folder: "./models/"
+  project_name: "$ProjectName$"
+  main_file: "./main.go"
+  api_folder: "./api/"

@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/goyourt/yogourt-cli/FileGenerator"
 	"github.com/spf13/cobra"
 )
 
@@ -50,29 +51,7 @@ func CreateConfigFile(ProjectName string) {
 	}
 	defer file.Close()
 
-	configFileContent := `
-app_name: "` + ProjectName + `"
-version: "1.0.0"
-mode: "development"
-
-server:
-  port: 8080
-  cors: true
-
-database:
-  type: "postgres"
-  user: "admin"
-  password: "password"
-  host: "localhost"
-  port: 5432
-  dbname: "mydb"
-
-paths:
-  model_folder: "./models/"
-  project_name: ` + ProjectName + `
-  main_file: "./main.go"
-  api_folder: "./api/"
-`
+	configFileContent := FileGenerator.GetComplexFileStr("config", map[string]string{"ProjectName": ProjectName})
 
 	file.WriteString(configFileContent) //Ecriture du contenu dans le fichier config
 }
@@ -107,22 +86,7 @@ func createMiddlewareFile(ProjectName string) {
 	}
 	defer file.Close() //Fermeture du fichier config
 
-	middlewareFileContent := `package main
-
-import (
-	"github.com/gin-gonic/gin"
-)
-
-var Callbacks = map[string]func(*gin.Context){
-	"/api":          base,
-}
-
-func base(c *gin.Context) {
-	c.Next()
-}
-
-func main() {}
-`
+	middlewareFileContent := FileGenerator.GetFileStr("middlewares")
 
 	file.WriteString(middlewareFileContent) //Ecriture du contenu dans le fichier middleware
 }
@@ -169,11 +133,7 @@ func InitProject(ProjectName string) {
 	}
 	defer file.Close() //Fermeture du fichier registry.go
 
-	registryFileContent := `package models
-
-var Models = map[string]interface{}{
-}
-`
+	registryFileContent := FileGenerator.GetFileStr("models")
 
 	file.WriteString(registryFileContent) //Ecriture du contenu dans le fichier registry.go
 
@@ -200,28 +160,7 @@ var Models = map[string]interface{}{
 	}
 	defer file.Close() //Fermeture du fichier migrate
 
-	migrationFileContent := `package main
-
-import (
-	"log"
-
-	"github.com/goyourt/yogourt-cli/database"
-	 ` + ProjectName + ` "/models"
-)
-
-func main() {
-	// Initialisation de la base de données
-	database.InitDatabase("../config.yaml")
-
-	for name, model := range models.Models {
-		if err := database.DB.AutoMigrate(model); err != nil {
-			log.Printf("❌ Échec de la migration du modèle '%s': %v", name, err)
-		} else {
-			log.Printf("✅ Migration réussie pour le modèle '%s'", name)
-		}
-	}
-}
-`
+	migrationFileContent := FileGenerator.GetComplexFileStr("migration", map[string]string{"ProjectName": ProjectName})
 	file.WriteString(migrationFileContent) //Ecriture du contenu dans le fichier migrate.go
 
 	/* Fichier main - présent dans le dossier principal */
@@ -235,16 +174,7 @@ func main() {
 	}
 	defer file.Close() //Fermeture du fichier main
 
-	mainFileContent := `package main
-
-import (
-	// Imports
-)
-
-func main() {
-	/* Bienvenue sur yogourt ! */
-}
-`
+	mainFileContent := FileGenerator.GetFileStr("main")
 	file.WriteString(mainFileContent) //Ecriture du contenu dans le fichier main.go
 
 	fmt.Println("L'environnement a été initialisé avec succès.")

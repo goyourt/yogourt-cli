@@ -1,0 +1,15 @@
+package main
+
+import (
+	"github.com/gin-gonic/gin"
+)
+
+var Callbacks = map[string]func(*gin.Context){
+	"/api": base,
+}
+
+func base(c *gin.Context) {
+	c.Next()
+}
+
+func main() {}
