@@ -7,6 +7,8 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+const ConfigPath = "./config.yaml"
+
 // Config Structure du fichier config
 type Config struct {
 	AppName string `yaml:"app_name"`
@@ -24,8 +26,17 @@ type Config struct {
 		Password string `yaml:"password"`
 		Host     string `yaml:"host"`
 		Port     int    `yaml:"port"`
-		DBName   string `yaml:"dbname"`
+		DB       string `yaml:"db"`
 	} `yaml:"database"`
+
+	AuthDB struct {
+		Type     string `yaml:"type"`
+		User     string `yaml:"user"`
+		Password string `yaml:"password"`
+		DB       string `yaml:"db"`
+		Host     string `yaml:"host"`
+		Port     int    `yaml:"port"`
+	} `yaml:"auth_db"`
 
 	Paths struct {
 		ModelFolder string `yaml:"model_folder"`
@@ -36,9 +47,9 @@ type Config struct {
 }
 
 // LoadConfig Lecture et parse du fichier config
-func LoadConfig(path string) (*Config, error) {
+func LoadConfig() (*Config, error) {
 
-	file, err := os.ReadFile(path)
+	file, err := os.ReadFile(ConfigPath)
 	if err != nil {
 		return nil, fmt.Errorf("❌ Impossible de lire config.yaml : %v", err)
 	}
