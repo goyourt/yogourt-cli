@@ -1,26 +1,19 @@
 package cmd
 
 import (
-	"fmt"
-	"log"
 	"os"
 	"os/exec"
-
-	"github.com/goyourt/yogourt-cli/config"
-	"github.com/goyourt/yogourt-cli/database"
 
 	"github.com/spf13/cobra"
 )
 
 /* Commande Migration */
 var MigrationCmd = &cobra.Command{
-	Use:   "migrate [modelName]",
-	Short: "Effectue une migration d'un modele",
-	Long:  "Effectue une migration d'un modele vers la base de données configurée",
-	Args:  cobra.ExactArgs(1),
+	Use:   "migrate",
+	Short: "Effectue une migration des modeles",
+	Long:  "Effectue une migration des modeles vers la base de donnée configurée",
 	Run: func(cmd *cobra.Command, args []string) {
-		modelName := args[0]
-		migrate(modelName)
+		migrate()
 	},
 }
 
@@ -45,35 +38,9 @@ func executeMigration() {
 	cmd.Run()
 }
 
-func migrate(modelName string) {
-
-	// Initialisation du fichier de logs
+func migrate() {
 	InitLogsFile()
-
-	// Vérification et lecture du fichier config
-	cfg, err := config.LoadConfig()
-	if err != nil {
-		fmt.Printf(`❌ Fichier config.yaml non trouvé, assurez vous que celui-ci se trouve à la racine de votre projet ou
-   			que vous avez entré la commande suivante: yogourt init project_name`)
-		log.Printf("ERROR: %s\n", err) // Ecriture des logs
-		return
-	} else {
-
-		// Récupération de la variable d'environnement depuis le fichier config
-		ModelFolder := cfg.Paths.ModelFolder
-
-		if _, err := os.Stat(ModelFolder + "/" + modelName + ".go"); os.IsNotExist(err) {
-			fmt.Println("❌ Aucun modèle trouvé, veuillez créer un modèle avec la commande suivante: yogourt model model_name")
-			log.Printf("ERROR: %s\n", err) // Ecriture des logs
-			return
-		} else {
-			// Initialisation BDD
-			database.InitDatabase()
-
-			// Migration via le fichier cmd/migrate/main.go
-			executeMigration()
-		}
-	}
+	executeMigration()
 }
 
 /* --- Ajout de la commande migration à la commande root --- */

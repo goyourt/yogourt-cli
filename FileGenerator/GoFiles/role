@@ -1,0 +1,24 @@
+package models
+
+import (
+	"fmt"
+)
+
+type Role struct {
+	ID int 	`gorm:"primaryKey;autoIncrement;not null;unique" json:"id"`
+	Name string 	`gorm:"not null;unique" json:"Name"`
+}
+
+// Champ Name
+func (u *Role) GetName() string {
+	return u.Name
+}
+
+func (u *Role) SetName(Name string) error {
+	if len(Name) == 0 {
+		return fmt.Errorf("Le nom ne peut pas être vide")
+	}
+	u.Name = Name
+	return nil
+}
+

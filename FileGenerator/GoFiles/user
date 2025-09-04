@@ -1,0 +1,23 @@
+package models
+
+import (
+	"fmt"
+)
+
+type User struct {
+	ID    int    `gorm:"primaryKey;autoIncrement;not null;unique" json:"id"`
+	Email string `json:"Email"`
+}
+
+// Champ Email
+func (u *User) GetEmail() string {
+	return u.Email
+}
+
+func (u *User) SetEmail(Email string) error {
+	if len(Email) == 0 {
+		return fmt.Errorf("Le nom ne peut pas être vide")
+	}
+	u.Email = Email
+	return nil
+}
