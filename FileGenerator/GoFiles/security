@@ -1,0 +1,30 @@
+package models
+
+import (
+	"golang.org/x/crypto/bcrypt"
+)
+
+type Security struct {
+	ID     int    `gorm:"primaryKey;autoIncrement;not null;unique" json:"id"`
+	UserId int    `gorm:"unique;not null"`
+	User   User   `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"User"`
+	Hash   string `gorm:"not null" json:"Hash"`
+}
+
+func (u *Security) GetUser() User {
+	return u.User
+}
+
+func (u *Security) SetHash(pwd string) error {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(pwd), 14)
+	if err != nil {
+		return err
+	}
+	u.Hash = string(bytes)
+	return nil
+}
+
+func (u *Security) CompareHash(pwd string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(u.Hash), []byte(pwd))
+	return err == nil
+}

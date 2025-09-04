@@ -14,7 +14,7 @@ import (
 var DB *gorm.DB
 
 // InitDatabase Chargement de la base de données
-func InitDatabase() {
+func Init() {
 	if DB != nil {
 		return
 	}
