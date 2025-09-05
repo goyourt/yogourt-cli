@@ -13,9 +13,20 @@ services:
     networks:
       - db
     restart: unless-stopped
+  cache:
+    container_name: $ProjectName$-cache
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - '6379:6379'
+    command: redis-server --save 20 1 --loglevel warning --requirepass cache-key
+    volumes:
+      - cache:/data
 networks:
   db:
     driver: bridge
 
 volumes:
   db:
+  cache:
+    driver: local

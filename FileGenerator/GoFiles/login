@@ -20,7 +20,7 @@ func POST(c *gin.Context) {
 
 	user, err := controllers.VerifyCredentials(req.Username, req.Password)
 	if err != nil {
-		c.JSON(401, gin.H{"error": "Invalid credentials"})
+		c.JSON(401, gin.H{"error": err.Error()})
 		return
 	}
 

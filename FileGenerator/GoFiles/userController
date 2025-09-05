@@ -19,10 +19,19 @@ func VerifyCredentials(username string, password string) (models.User, error) {
 		First(&security).Error
 
 	if err != nil {
-		return models.User{}, err
+		return models.User{}, fmt.Errorf("user not found")
+	}
+
+	failures, err := services.GetPasswordFailureCount(username)
+	if err != nil {
+		return models.User{}, fmt.Errorf("Failed to access cache for user %s", username)
+	}
+	if failures >= 5 {
+		return models.User{}, fmt.Errorf("too many login attempts, please try again later")
 	}
 
 	if !security.CompareHash(password) {
+		services.SavePasswordFailure(username)
 		return models.User{}, fmt.Errorf("invalid credentials")
 	}
 
