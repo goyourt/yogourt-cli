@@ -9,6 +9,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var projectNameInterface map[string]string
+
 /* Commande init */
 var initCmd = &cobra.Command{
 	Use:   "init [projectName]",
@@ -18,9 +20,10 @@ var initCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		projectName := args[0]
 
-		createConfigFile(projectName)
+		projectNameInterface = map[string]string{"ProjectName": projectName}
+		createConfigFile()
 		initProject(projectName)
-		createMiddlewareFile(projectName)
+		createMiddlewareFile()
 		initAuth()
 	},
 }
@@ -36,13 +39,13 @@ func InitLogsFile() {
 }
 
 /* --- Création du fichier config --- */
-func createConfigFile(ProjectName string) {
+func createConfigFile() {
 
 	// Initialisation du fichier de logs
 	InitLogsFile()
 
 	configPath := "./config.yaml"
-	configFileContent := FileGenerator.GetComplexFileStr("config", map[string]string{"ProjectName": ProjectName})
+	configFileContent := FileGenerator.GetComplexFileStr("config", projectNameInterface)
 
 	FileGenerator.GenerateFile(configPath, configFileContent)
 }
@@ -50,7 +53,7 @@ func createConfigFile(ProjectName string) {
 /* --- Fin création du fichier config --- */
 
 /* --- Création du fichier middleware --- */
-func createMiddlewareFile(ProjectName string) {
+func createMiddlewareFile() {
 	InitLogsFile()
 
 	middlewareFolder := "./middleware/"
@@ -87,12 +90,12 @@ func initProject(projectName string) {
 
 	/* Fichier migrate.go */
 	migrateFile := cmdFolder + "/migrate.go"
-	migrationFileContent := FileGenerator.GetComplexFileStr("migration", map[string]string{"ProjectName": projectName})
+	migrationFileContent := FileGenerator.GetComplexFileStr("migration", projectNameInterface)
 
 	FileGenerator.GenerateFile(migrateFile, migrationFileContent)
 
 	/* docker-compose */
-	dockerComposeFileContent := FileGenerator.GetComplexFileStr("docker-compose", map[string]string{"ProjectName": projectName})
+	dockerComposeFileContent := FileGenerator.GetComplexFileStr("docker-compose", projectNameInterface)
 	FileGenerator.GenerateFile("./docker-compose.yml", dockerComposeFileContent)
 
 	/* Fichier main - présent dans le dossier principal */
@@ -113,11 +116,33 @@ func initAuth() {
 	tokenFile, tokenContent := modelFolder+"Token.go", FileGenerator.GetFileStr("token")
 	userFile, userContent := modelFolder+"User.go", FileGenerator.GetFileStr("user")
 
+	routesFolder := "./api/auth/"
+	loginFile, loginContent := routesFolder+"login/login.go", FileGenerator.GetComplexFileStr("login", projectNameInterface)
+	signupFile, signupContent := routesFolder+"signup/signup.go", FileGenerator.GetComplexFileStr("signup", projectNameInterface)
+
+	controllerFolder := "./controllers/"
+	tokenControllerFile, tokenControllerContent := controllerFolder+"tokenController.go", FileGenerator.GetComplexFileStr("tokenController", projectNameInterface)
+	userControllerFile, userControllerContent := controllerFolder+"userController.go", FileGenerator.GetComplexFileStr("userController", projectNameInterface)
+
+	serviceFolder := "./services/"
+	userServicesFile, userServicesContent := serviceFolder+"userServices.go", FileGenerator.GetComplexFileStr("userServices", projectNameInterface)
+
 	FileGenerator.GenerateFile(roleFile, roleContent)
 	FileGenerator.GenerateFile(securityFile, securityContent)
 	FileGenerator.GenerateFile(securityRoleFile, securityRoleContent)
 	FileGenerator.GenerateFile(tokenFile, tokenContent)
 	FileGenerator.GenerateFile(userFile, userContent)
+
+	FileGenerator.CreateFolder(routesFolder)
+	FileGenerator.CreateFolder(routesFolder + "login")
+	FileGenerator.CreateFolder(routesFolder + "signup")
+	FileGenerator.GenerateFile(loginFile, loginContent)
+	FileGenerator.GenerateFile(signupFile, signupContent)
+	FileGenerator.CreateFolder(controllerFolder)
+	FileGenerator.GenerateFile(tokenControllerFile, tokenControllerContent)
+	FileGenerator.GenerateFile(userControllerFile, userControllerContent)
+	FileGenerator.CreateFolder(serviceFolder)
+	FileGenerator.GenerateFile(userServicesFile, userServicesContent)
 }
 
 /* --- Ajout de la commande init à la commande root --- */

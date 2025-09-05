@@ -20,3 +20,7 @@ paths:
   project_name: "$ProjectName$"
   main_file: "./main.go"
   api_folder: "./api/"
+  
+security:
+  secret_key: "supersecret"
+  token_expires: 1440 # one day

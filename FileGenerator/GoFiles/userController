@@ -1,0 +1,46 @@
+package controllers
+
+import (
+	"context"
+	"fmt"
+
+	"github.com/goyourt/yogourt/services"
+	"gorm.io/gorm"
+
+	"$ProjectName$/models"
+)
+
+func VerifyCredentials(username string, password string) (models.User, error) {
+	var security models.Security
+	db := services.GetDB()
+
+	err := db.Joins("User").
+		Where(`"User".email = ?`, username).
+		First(&security).Error
+
+	if err != nil {
+		return models.User{}, err
+	}
+
+	if !security.CompareHash(password) {
+		return models.User{}, fmt.Errorf("invalid credentials")
+	}
+
+	return security.User, err
+}
+
+func CreateUser(user models.User, password string) (models.User, error) {
+	db := services.GetDB()
+	ctx := context.Background()
+	security := models.Security{
+		User: user,
+	}
+	err := security.SetHash(password)
+	if err != nil {
+		return models.User{}, err
+	}
+
+	err = gorm.G[models.Security](db, gorm.WithResult()).Create(ctx, &security)
+
+	return security.User, err
+}
