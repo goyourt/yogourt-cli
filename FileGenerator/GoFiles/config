@@ -15,12 +15,18 @@ database:
   port: 5432
   db: "mydb"
 
+cache:
+  host: "localhost"
+  port: 6379
+  password: "cache-key"
+  db: 0
+
 paths:
   model_folder: "./models/"
   project_name: "$ProjectName$"
   main_file: "./main.go"
   api_folder: "./api/"
-  
+
 security:
   secret_key: "supersecret"
   token_expires: 1440 # one day
