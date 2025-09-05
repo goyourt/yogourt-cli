@@ -11,7 +11,7 @@ import (
 	"unicode"
 
 	"github.com/goyourt/yogourt-cli/FileGenerator"
-	"github.com/goyourt/yogourt-cli/config"
+	"github.com/goyourt/yogourt/services"
 
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/fatih/color"
@@ -52,13 +52,7 @@ func CreateModel() {
 	InitLogsFile()
 
 	// Vérification et lecture du fichier config
-	cfg, err := config.LoadConfig()
-	if err != nil {
-		fmt.Printf(`❌ Fichier config.yaml non trouvé, assurez vous que celui-ci se trouve à la racine de votre projet ou
-			que vous avez entré la commande suivante: yogourt init project_name`)
-		log.Printf("ERROR: %s\n", err) // Ecriture des logs
-		return
-	}
+	cfg := services.GetConfig()
 
 	// Récupération de la variable d'environnement depuis le fichier config
 	ModelFolder := cfg.Paths.ModelFolder
@@ -77,7 +71,6 @@ func CreateModel() {
 
 	if string(ModelNamerunes) == "" || !validName.MatchString(string(ModelNamerunes)) {
 		fmt.Println("❌ Nom invalide, veuillez entrer un nom en lettres uniquement.")
-		log.Printf("ERROR: %s\n", err) // Ecriture des logs
 
 		return
 	}
@@ -230,7 +223,7 @@ func CreateModel() {
 	}
 
 	// Ecriture dans le fichier modele
-	_, err = modelFile.WriteString(modelFileContent)
+	_, err := modelFile.WriteString(modelFileContent)
 	if err != nil {
 		fmt.Printf("❌ Erreur d'écriture dans le fichier modèle : %v\n", err)
 		log.Printf("ERROR: %s\n", err) // Ecriture des logs

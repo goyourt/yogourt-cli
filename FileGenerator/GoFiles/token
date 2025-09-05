@@ -6,8 +6,8 @@ import (
 
 type Token struct {
 	ID         int      `gorm:"primaryKey;autoIncrement;not null;unique" json:"id"`
-	SecurityId int      `gorm:"not null"`
-	Security   Security `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"Security"`
+	SecurityId int      `gorm:"not null" json:"-"`
+	Security   Security `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"-"`
 	Token      string   `gorm:"not null" json:"Token"`
 }
 

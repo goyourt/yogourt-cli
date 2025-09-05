@@ -1,0 +1,36 @@
+package controllers
+
+import (
+	"context"
+
+	"github.com/goyourt/yogourt/services"
+	"gorm.io/gorm"
+
+	"$ProjectName$/models"
+)
+
+func CreateToken(user models.User) (models.Token, error) {
+	db := services.GetDB()
+	ctx := context.Background()
+	tokenString, err := services.CreateToken(user.Email)
+	if err != nil {
+		return models.Token{}, err
+	}
+
+	var security models.Security
+	err = db.Joins("User").
+		Where(`"User".email = ?`, user.Email).
+		First(&security).Error
+
+	if err != nil {
+		return models.Token{}, err
+	}
+
+	token := models.Token{
+		Security: security,
+		Token:    tokenString,
+	}
+	err = gorm.G[models.Token](db, gorm.WithResult()).Create(ctx, &token)
+
+	return token, err
+}

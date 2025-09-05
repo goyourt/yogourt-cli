@@ -1,6 +1,7 @@
 package models
 
 import (
+	"github.com/goyourt/yogourt/services"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -16,11 +17,11 @@ func (u *Security) GetUser() User {
 }
 
 func (u *Security) SetHash(pwd string) error {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(pwd), 14)
+	hash, err := services.GetHashedPassword(pwd)
 	if err != nil {
 		return err
 	}
-	u.Hash = string(bytes)
+	u.Hash = hash
 	return nil
 }
 

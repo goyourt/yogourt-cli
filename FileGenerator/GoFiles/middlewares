@@ -1,14 +1,31 @@
 package main
 
 import (
+	"net/http"
+
 	"github.com/gin-gonic/gin"
+	"github.com/goyourt/yogourt/services"
 )
 
 var Callbacks = map[string]func(*gin.Context){
-	"/api": base,
+	"/api":      auth,
+	"/api/auth": nil,
 }
 
-func base(c *gin.Context) {
+func auth(c *gin.Context) {
+	token, err := services.GetRequestToken(c)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": err})
+		c.Abort()
+		return
+	}
+
+	if err := services.ValidToken(token); err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
+		c.Abort()
+		return
+	}
+
 	c.Next()
 }
 
