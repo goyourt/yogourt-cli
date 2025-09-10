@@ -6,18 +6,18 @@ import (
 
 type User struct {
 	ID    int    `gorm:"primaryKey;autoIncrement;not null;unique" json:"id"`
-	Email string `json:"Email"`
+	Username string `json:"Username"`
 }
 
-// Champ Email
-func (u *User) GetEmail() string {
-	return u.Email
+// Champ Username
+func (u *User) GetUsername() string {
+	return u.Username
 }
 
-func (u *User) SetEmail(Email string) error {
-	if len(Email) == 0 {
+func (u *User) SetUsername(Username string) error {
+	if len(Username) == 0 {
 		return fmt.Errorf("Le nom ne peut pas être vide")
 	}
-	u.Email = Email
+	u.Username = Username
 	return nil
 }

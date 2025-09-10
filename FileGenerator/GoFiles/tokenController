@@ -12,14 +12,14 @@ import (
 func CreateToken(user models.User) (models.Token, error) {
 	db := services.GetDB()
 	ctx := context.Background()
-	tokenString, err := services.CreateToken(user.Email)
+	tokenString, err := services.CreateToken(user.Username)
 	if err != nil {
 		return models.Token{}, err
 	}
 
 	var security models.Security
 	err = db.Joins("User").
-		Where(`"User".email = ?`, user.Email).
+		Where(`"User".username = ?`, user.Username).
 		First(&security).Error
 
 	if err != nil {
