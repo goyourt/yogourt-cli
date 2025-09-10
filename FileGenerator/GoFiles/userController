@@ -15,7 +15,7 @@ func VerifyCredentials(username string, password string) (models.User, error) {
 	db := services.GetDB()
 
 	err := db.Joins("User").
-		Where(`"User".email = ?`, username).
+		Where(`"User".username = ?`, username).
 		First(&security).Error
 
 	if err != nil {

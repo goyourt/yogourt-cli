@@ -2,8 +2,6 @@ module github.com/goyourt/yogourt-cli
 
 go 1.24.0
 
-replace github.com/goyourt/yogourt-cli => ../yogourt-cli //dev
-
 require (
 	github.com/fatih/color v1.18.0
 	gorm.io/gorm v1.25.10

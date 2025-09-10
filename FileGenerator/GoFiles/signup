@@ -21,7 +21,7 @@ func POST(c *gin.Context) {
 	}
 
 	user := models.User{
-		Email: req.Username,
+		Username: req.Username,
 	}
 	user, err := controllers.CreateUser(user, req.Password)
 	if err != nil {
