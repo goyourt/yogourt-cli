@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/goyourt/yogourt-cli/FileGenerator"
+	"github.com/goyourt/yogourt/services"
 	"github.com/spf13/cobra"
 )
 
@@ -47,7 +48,7 @@ func createConfigFile() {
 	configPath := "./config.yaml"
 	configFileContent := FileGenerator.GetComplexFileStr("config", projectNameInterface)
 
-	FileGenerator.GenerateFile(configPath, configFileContent)
+	services.GenerateFile(configPath, configFileContent)
 }
 
 /* --- Fin création du fichier config --- */
@@ -57,13 +58,13 @@ func createMiddlewareFile() {
 	InitLogsFile()
 
 	middlewareFolder := "./middleware/"
-	FileGenerator.CreateFolder(middlewareFolder)
+	services.CreateFolder(middlewareFolder)
 
 	//Création du fichier middleware
 	middlewareFile := middlewareFolder + "middleware.go"
 	middlewareFileContent := FileGenerator.GetFileStr("middlewares")
 
-	FileGenerator.GenerateFile(middlewareFile, middlewareFileContent)
+	services.GenerateFile(middlewareFile, middlewareFileContent)
 }
 
 /* --- Fin création du fichier middleware --- */
@@ -72,35 +73,37 @@ func createMiddlewareFile() {
 func initProject(projectName string) {
 	InitLogsFile()
 
-	FileGenerator.CreateFolder("./api/")
+	services.CreateFolder("./api/")
+	services.CreateFolder("./public/")
+	services.CreateFolder("./public/files/")
 
 	modelFolder := "./models/"
-	FileGenerator.CreateFolder(modelFolder)
+	services.CreateFolder(modelFolder)
 
 	/* Fichier modelRegistry - présent dans le dossier models */
 	modelRegistryFile := modelFolder + "registry.go"
 	registryFileContent := FileGenerator.GetFileStr("registry")
 
-	FileGenerator.GenerateFile(modelRegistryFile, registryFileContent)
+	services.GenerateFile(modelRegistryFile, registryFileContent)
 
 	/* --- Création du fichier cmd/migrate.go --- */
 	/* Dossier cmd */
 	cmdFolder := "./cmd/"
-	FileGenerator.CreateFolder(cmdFolder)
+	services.CreateFolder(cmdFolder)
 
 	/* Fichier migrate.go */
 	migrateFile := cmdFolder + "/migrate.go"
 	migrationFileContent := FileGenerator.GetComplexFileStr("migration", projectNameInterface)
 
-	FileGenerator.GenerateFile(migrateFile, migrationFileContent)
+	services.GenerateFile(migrateFile, migrationFileContent)
 
 	/* docker-compose */
 	dockerComposeFileContent := FileGenerator.GetComplexFileStr("docker-compose", projectNameInterface)
-	FileGenerator.GenerateFile("./docker-compose.yml", dockerComposeFileContent)
+	services.GenerateFile("./docker-compose.yml", dockerComposeFileContent)
 
 	/* Fichier main - présent dans le dossier principal */
 	mainFileContent := FileGenerator.GetFileStr("main")
-	FileGenerator.GenerateFile("./main.go", mainFileContent)
+	services.GenerateFile("./main.go", mainFileContent)
 
 	fmt.Println("L'environnement a été initialisé avec succès.")
 
@@ -127,22 +130,22 @@ func initAuth() {
 	serviceFolder := "./services/"
 	userServicesFile, userServicesContent := serviceFolder+"userServices.go", FileGenerator.GetComplexFileStr("userServices", projectNameInterface)
 
-	FileGenerator.GenerateFile(roleFile, roleContent)
-	FileGenerator.GenerateFile(securityFile, securityContent)
-	FileGenerator.GenerateFile(securityRoleFile, securityRoleContent)
-	FileGenerator.GenerateFile(tokenFile, tokenContent)
-	FileGenerator.GenerateFile(userFile, userContent)
+	services.GenerateFile(roleFile, roleContent)
+	services.GenerateFile(securityFile, securityContent)
+	services.GenerateFile(securityRoleFile, securityRoleContent)
+	services.GenerateFile(tokenFile, tokenContent)
+	services.GenerateFile(userFile, userContent)
 
-	FileGenerator.CreateFolder(routesFolder)
-	FileGenerator.CreateFolder(routesFolder + "login")
-	FileGenerator.CreateFolder(routesFolder + "signup")
-	FileGenerator.GenerateFile(loginFile, loginContent)
-	FileGenerator.GenerateFile(signupFile, signupContent)
-	FileGenerator.CreateFolder(controllerFolder)
-	FileGenerator.GenerateFile(tokenControllerFile, tokenControllerContent)
-	FileGenerator.GenerateFile(userControllerFile, userControllerContent)
-	FileGenerator.CreateFolder(serviceFolder)
-	FileGenerator.GenerateFile(userServicesFile, userServicesContent)
+	services.CreateFolder(routesFolder)
+	services.CreateFolder(routesFolder + "login")
+	services.CreateFolder(routesFolder + "signup")
+	services.GenerateFile(loginFile, loginContent)
+	services.GenerateFile(signupFile, signupContent)
+	services.CreateFolder(controllerFolder)
+	services.GenerateFile(tokenControllerFile, tokenControllerContent)
+	services.GenerateFile(userControllerFile, userControllerContent)
+	services.CreateFolder(serviceFolder)
+	services.GenerateFile(userServicesFile, userServicesContent)
 }
 
 /* --- Ajout de la commande init à la commande root --- */
