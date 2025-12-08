@@ -4,12 +4,12 @@ import (
 	"log"
 	"$ProjectName$/models"
 
-	"github.com/goyourt/yogourt/services"
+	"github.com/goyourt/yogourt/services/providers"
 )
 
 func main() {
 	for name, model := range models.Models {
-		if err := services.GetDB().AutoMigrate(model); err != nil {
+		if err := providers.GetDB().AutoMigrate(model); err != nil {
 			log.Printf("❌ Échec de la migration du modèle '%s': %v", name, err)
 		} else {
 			log.Printf("✅ Migration réussie pour le modèle '%s'", name)

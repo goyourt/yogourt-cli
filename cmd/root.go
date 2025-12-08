@@ -9,9 +9,9 @@ import (
 var rootCmd = &cobra.Command{
 	Use:   "yogourt",
 	Short: "yogourt CLI",
-	Long:  "Ceci est un CLI pour le package yogourt.",
+	Long:  "This is the Command Line Interface for yogourt.",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("Bienvenue dans yogourt !")
+		fmt.Println("Welcome to yogourt !")
 	},
 }
 

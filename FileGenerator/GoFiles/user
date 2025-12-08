@@ -2,22 +2,38 @@ package models
 
 import (
 	"fmt"
+
+	"github.com/goyourt/yogourt/interfaces"
+	"github.com/goyourt/yogourt/services/database"
 )
 
 type User struct {
-	ID    int    `gorm:"primaryKey;autoIncrement;not null;unique" json:"id"`
-	Username string `json:"Username"`
+	interfaces.Base
+	Security   *Security `json:"-" gorm:"foreignKey:SecurityId; references:ID;"`
+	SecurityId int       `json:"-" gorm:"unique; default:null"`
+	Username   string    `json:"username"`
 }
 
-// Champ Username
 func (u *User) GetUsername() string {
 	return u.Username
 }
 
 func (u *User) SetUsername(Username string) error {
 	if len(Username) == 0 {
-		return fmt.Errorf("Le nom ne peut pas être vide")
+		return fmt.Errorf("Username cannot be empty")
 	}
 	u.Username = Username
+	return nil
+}
+
+func (u *User) GetSecurity() *Security {
+	database.HydrateRelation(u, "Security", u.Security, u.SecurityId)
+	return u.Security
+}
+func (u *User) SetSecurity(Security *Security) error {
+	if Security == nil {
+		return fmt.Errorf("Security cannot be nil")
+	}
+	u.Security = Security
 	return nil
 }

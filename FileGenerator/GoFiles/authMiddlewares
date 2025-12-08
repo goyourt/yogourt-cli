@@ -1,0 +1,21 @@
+package main
+
+import (
+	"$ProjectName$/models"
+
+	"github.com/gin-gonic/gin"
+	"github.com/goyourt/yogourt/services"
+)
+
+var Callbacks = map[string]func(*gin.Context){
+	"/api":                   auth,
+	"/api/auth":              nil,
+	"/api/auth/new-password": auth,
+}
+
+func auth(c *gin.Context) {
+	services.Authenticate(c, &models.User{})
+	c.Next()
+}
+
+func main() {}

@@ -1,0 +1,36 @@
+package main
+
+import (
+	"net/http"
+
+	"$ProjectName$/controllers"
+
+	"github.com/gin-gonic/gin"
+	"github.com/goyourt/yogourt/routing"
+)
+
+func GET(c *gin.Context) {
+	uuid := c.Query("uuid")
+	file, err := controllers.GetFile(uuid)
+
+	if err != nil {
+		routing.RespondAndAbort(c, http.StatusNotFound, err.Error())
+		return
+	}
+
+	c.File(file.GetPath())
+	c.Next()
+}
+
+func POST(c *gin.Context) {
+	file, err := controllers.CreateFile(c)
+
+	if err != nil {
+		routing.RespondAndAbort(c, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	routing.RespondSuccess(c, http.StatusCreated, &file)
+}
+
+func main() {}

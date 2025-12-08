@@ -1,10 +1,12 @@
 package main
 
 import (
+	"net/http"
+
 	"$ProjectName$/controllers"
-	"$ProjectName$/models"
 
 	"github.com/gin-gonic/gin"
+	"github.com/goyourt/yogourt/routing"
 )
 
 type SignupRequest struct {
@@ -14,22 +16,22 @@ type SignupRequest struct {
 
 func POST(c *gin.Context) {
 	var req SignupRequest
-
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
+	if !routing.HandleRequest(c, &req) {
 		return
 	}
 
-	user := models.User{
-		Username: req.Username,
+	if controllers.IsExistingUsername(req.Username) {
+		routing.RespondAndAbort(c, http.StatusConflict, "Username already exists")
+		return
 	}
-	user, err := controllers.CreateUser(user, req.Password)
+
+	user, err := controllers.CreateUser(c, req.Username, req.Password)
 	if err != nil {
-		c.JSON(500, gin.H{"error": "Could not create user"})
+		routing.RespondAndAbort(c, http.StatusInternalServerError, "Could not create user")
 		return
 	}
 
-	c.JSON(201, gin.H{"user": user})
+	routing.RespondSuccess(c, http.StatusCreated, &user)
 }
 
 func main() {}

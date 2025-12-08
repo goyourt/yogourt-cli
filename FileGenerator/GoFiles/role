@@ -2,11 +2,13 @@ package models
 
 import (
 	"fmt"
+
+	"github.com/goyourt/yogourt/interfaces"
 )
 
 type Role struct {
-	ID int 	`gorm:"primaryKey;autoIncrement;not null;unique" json:"id"`
-	Name string 	`gorm:"not null;unique" json:"Name"`
+	interfaces.Base
+	Name string `gorm:"not null;unique" json:"name"`
 }
 
 // Champ Name
@@ -21,4 +23,3 @@ func (u *Role) SetName(Name string) error {
 	u.Name = Name
 	return nil
 }
-
