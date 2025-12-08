@@ -11,58 +11,49 @@ import (
 	"unicode"
 
 	"github.com/goyourt/yogourt-cli/FileGenerator"
-	"github.com/goyourt/yogourt/services"
+	"github.com/goyourt/yogourt/services/providers"
 
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
 
-/* Commande Model */
+/* model command */
 var ModelCmd = &cobra.Command{
 	Use:   "model",
-	Short: "Crée un modèle",
-	Long:  "Crée un modèle de table lié à la base de données",
+	Short: "Create a model",
+	Long:  "Create a table from the model in the database",
 	Run: func(cmd *cobra.Command, args []string) {
 		CreateModel()
 	},
 }
 
-// Fonction de création du modele
 func CreateModel() {
-
-	// Initialisation des couleurs du text
+	// Init text color
 	green := color.New(color.FgGreen).SprintFunc()
 	blue := color.New(color.FgBlue).SprintFunc()
 
-	// Structure d'un champ
 	type Field struct {
 		Name       string
 		Type       string
 		Constraint string
 	}
 
-	// Structure d'un modele
 	type Model struct {
 		Name   string
 		Fields []Field
 	}
 
-	// Initialisation du fichier de logs
 	InitLogsFile()
+	cfg := providers.GetConfig()
 
-	// Vérification et lecture du fichier config
-	cfg := services.GetConfig()
-
-	// Récupération de la variable d'environnement depuis le fichier config
 	ModelFolder := cfg.Paths.ModelFolder
 
-	// Regex pour vérifier que le nom du modele et des champs (lettres en minuscules/majuscules)
 	var validName = regexp.MustCompile(`^[a-zA-Z_]+$`)
 
-	/* --- Début du wizard --- */
-	// Nom du modele
-	fmt.Printf("%s ", blue("Quel est le nom du modèle ?\n"))
+	/* --- wizard --- */
+	// Model name
+	fmt.Printf("%s ", blue("What is the model name ?\n"))
 	var modelName string
 	fmt.Scanln(&modelName)
 
@@ -70,55 +61,51 @@ func CreateModel() {
 	ModelNamerunes[0] = unicode.ToUpper(ModelNamerunes[0])
 
 	if string(ModelNamerunes) == "" || !validName.MatchString(string(ModelNamerunes)) {
-		fmt.Println("❌ Nom invalide, veuillez entrer un nom en lettres uniquement.")
+		fmt.Println("❌ Invalid name, only letters authorized.")
 
 		return
 	}
 
-	fmt.Println(green("Nom du modèle: ", string(ModelNamerunes)))
+	fmt.Println(green("Model name: ", string(ModelNamerunes)))
 
-	// Type d'ID
 	idType := ""
 	survey.AskOne(&survey.Select{
-		Message: blue("Quel type d'ID voulez-vous ?"),
-		Options: []string{"Int (auto-incrémenté)", "UUID"},
+		Message: blue("Choose id type ?"),
+		Options: []string{"Int (auto-increment)", "UUID"},
 	}, &idType)
 
-	// Création d'un slice pour les champs
 	var fields []Field
 
-	// Nom, type et contraintes des champs
 	for moreFields() {
-		// Nom du champ
-		fmt.Printf("%s ", blue("Quel est le nom de votre champ ?\n"))
+		fmt.Printf("%s ", blue("Enter the field name ?\n"))
 		var fieldName string
 		fmt.Scanln(&fieldName)
 
+		// Field name
 		FieldNamerunes := []rune(fieldName)
 		FieldNamerunes[0] = unicode.ToUpper(FieldNamerunes[0])
 
 		if string(FieldNamerunes) == "" || !validName.MatchString(string(FieldNamerunes)) {
-			fmt.Println("❌ Nom du champ invalide, veuillez entrer un nom en lettres uniquement.")
+			fmt.Println("❌ Invalid field name, only letters authorized.")
 			return
 		}
 
-		// Type du champ (Utilisation de survey pour proposer des choix à l'utilisateur)
+		// Field type
 		fieldType := ""
 		TypePrompt := &survey.Select{
-			Message: blue("Choisissez le type du champ :"),
+			Message: blue("Enter field type :"),
 			Options: []string{"string", "int", "bool", "float", "datetime"},
 		}
-		survey.AskOne(TypePrompt, &fieldType) // Proposition du champ
+		survey.AskOne(TypePrompt, &fieldType)
 
-		// Contraintes du champ (Utilisation de survey pour proposer des choix à l'utilisateur)
+		// Field constraint
 		fieldConstraint := ""
 		ConstraintPrompt := &survey.Select{
-			Message: blue("Ajouter (ou non) une contrainte au champ :"),
-			Options: []string{"NOT NULL", "UNIQUE", "UNIQUE & NOT NULL", "Aucune"},
+			Message: blue("Add field constraint :"),
+			Options: []string{"NOT NULL", "UNIQUE", "UNIQUE & NOT NULL", "None"},
 		}
-		survey.AskOne(ConstraintPrompt, &fieldConstraint) // Proposition du champ
+		survey.AskOne(ConstraintPrompt, &fieldConstraint)
 
-		// Ajout du champ dans le slice
 		field := Field{
 			Name:       string(FieldNamerunes),
 			Type:       fieldType,
@@ -130,32 +117,29 @@ func CreateModel() {
 		fmt.Println(green("Champ " + string(FieldNamerunes) + " de type " + fieldType + " à été créé avec succès."))
 	}
 
-	// Génération du modele
+	// Generate model
 	newModelFile := ModelFolder + modelName + ".go"
 
 	modelFile, modelFileError := os.Create(newModelFile)
 	if modelFileError != nil {
-		fmt.Printf("❌ Erreur lors de la création du model: %s\n", modelFileError)
-		log.Printf("ERROR: %s\n", modelFileError) // Ecriture des logs
+		fmt.Printf("❌ Error while creating model: %s\n", modelFileError)
+		log.Printf("ERROR: %s\n", modelFileError)
 		return
 	}
 	defer modelFile.Close()
 
-	// Contenu du modele
 	modelFileContent := FileGenerator.GetFileStr("newModel")
 
 	modelFileContent += fmt.Sprintf("type %s struct {\n", modelName)
-	// Ajout de l'ID selon le type (ID ou UUID)
 	if idType == "UUID" {
 		modelFileContent += "\tID string \t`gorm:\"type:uuid;default:gen_random_uuid();primaryKey\" json:\"id\"`\n"
 	} else {
 		modelFileContent += "\tID int \t`gorm:\"primaryKey;autoIncrement;not null;unique\" json:\"id\"`\n"
 	}
 
-	// Ajoute les champs
 	for _, field := range fields {
 		modelFileContent += fmt.Sprintf("\t%s %s ", field.Name, field.Type)
-		if field.Constraint != "Aucune" {
+		if field.Constraint != "None" {
 			switch field.Constraint {
 			case "UNIQUE & NOT NULL":
 				modelFileContent += fmt.Sprintf("\t`gorm:\"not null;unique\" json:\"%s\"`\n", field.Name)
@@ -171,20 +155,18 @@ func CreateModel() {
 
 	modelFileContent += "}\n\n"
 
-	// Ajout des getters et setters pour chaque champs
 	for _, field := range fields {
-		modelFileContent += fmt.Sprintf("// Champ %s\n", field.Name)
+		modelFileContent += fmt.Sprintf("// Field %s\n", field.Name)
 		// Getter
 		modelFileContent += fmt.Sprintf("func (u *%s) Get%s() %s {\n", modelName, field.Name, field.Type)
 		modelFileContent += fmt.Sprintf("\treturn u.%s\n}\n\n", field.Name)
 		// Setter
 		modelFileContent += fmt.Sprintf("func (u *%s) Set%s(%s %s) error {", modelName, field.Name, field.Name, field.Type)
-		// Contenu du setter selon le type de champ
 		switch field.Type {
 		case "int":
 			modelFileContent += `
 	if ` + field.Name + ` < 0 {
-		return fmt.Errorf("La valeur ne peut pas être négative")
+		return fmt.Errorf("value cannot be negative")
 	}
 	u.` + field.Name + ` = ` + field.Name + `
 	return nil
@@ -194,7 +176,7 @@ func CreateModel() {
 		case "string":
 			modelFileContent += `
 	if len(` + field.Name + `) == 0 {
-		return fmt.Errorf("Le champ ne peut pas être vide")
+		return fmt.Errorf("field cannot be empty")
 	}
 	u.` + field.Name + ` = ` + field.Name + `
 	return nil
@@ -204,7 +186,7 @@ func CreateModel() {
 		case "float":
 			modelFileContent += `
 	if ` + field.Name + ` < 0.00 {
-		return fmt.Errorf("La valeur ne peut pas être négative")
+		return fmt.Errorf("value cannot be negative")
 	}
 	u.` + field.Name + ` = ` + field.Name + `
 	return nil
@@ -222,61 +204,49 @@ func CreateModel() {
 
 	}
 
-	// Ecriture dans le fichier modele
 	_, err := modelFile.WriteString(modelFileContent)
 	if err != nil {
-		fmt.Printf("❌ Erreur d'écriture dans le fichier modèle : %v\n", err)
-		log.Printf("ERROR: %s\n", err) // Ecriture des logs
+		fmt.Printf("❌ Error while writing file : %v\n", err)
+		log.Printf("ERROR: %s\n", err)
 		return
 	}
 
-	fmt.Println(green("✅ Modèle " + modelName + " créé avec succès."))
+	fmt.Println(green("✅ Model " + modelName + " successfully created."))
 
-	/* --- Ajout du model dans registry.go --- */
 	registryFile := ModelFolder + "registry.go"
 
-	registryFileContent, err := os.ReadFile(registryFile) //Lecture du fichier
+	registryFileContent, err := os.ReadFile(registryFile)
 	if err != nil {
-		fmt.Printf("Erreur lors de la lecture du fichier registry.go: %v \n", err)
-		log.Printf("ERROR: %s\n", err) // Ecriture des logs
+		fmt.Printf("Erreur while reading registry.go: %v \n", err)
+		log.Printf("ERROR: %s\n", err)
 	}
 
-	// Convertion du contenu en chaîne de caractères
 	contentStr := string(registryFileContent)
-
-	// Vérifie si le modèle est déjà présent
 	if strings.Contains(contentStr, `"`+modelName+`": &`+modelName+`{}`) {
-		fmt.Println("✅ Le modèle est déjà présent dans registry.go")
+		fmt.Println("✅ Model already in registry.go")
 		return
 	}
 
-	// Recherche l'endroit où insérer le nouveau modèle
 	mapMarker := "map[string]interface{}{"
 	index := strings.Index(contentStr, mapMarker)
 	if index == -1 {
-		fmt.Println("❌ Impossible de trouver la map Models dans registry.go")
+		fmt.Println("❌ Cannot find model map in registry.go")
 		return
 	}
 
-	// Point d'insertion : juste après "map[string]interface{}{"
 	insertionPoint := index + len(mapMarker)
-
-	// Construire la nouvelle ligne du modèle
 	newEntry := `"` + modelName + `": &` + modelName + `{},`
-
-	// Insertion propre (ajoute avec retour à la ligne et indentation)
 	newContent := contentStr[:insertionPoint] + "\n\t" + newEntry + contentStr[insertionPoint:]
 
-	// Réécrire le fichier
 	err = os.WriteFile(registryFile, []byte(newContent), 0644)
 	if err != nil {
-		fmt.Printf("❌ Erreur lors de l'écriture du fichier registry.go: %v\n", err)
-		log.Printf("ERROR: %s\n", err) // Ecriture des logs
+		fmt.Printf("❌ Error writing registry.go: %v\n", err)
+		log.Printf("ERROR: %s\n", err)
 		return
 	}
 
-	fmt.Println("✅ Modèle ajouté à registry.go avec succès")
-	log.Printf("Modèle créé avec succès: %s\n", modelName) // Ecriture des logs
+	fmt.Println("✅ Model successfully added to registry.go")
+	log.Printf("Model successfully created: %s\n", modelName)
 }
 
 func moreFields() bool {
@@ -287,7 +257,7 @@ func moreFields() bool {
 	return strings.ToLower(response) != "n"
 }
 
-/* --- Ajout de la commande model à la commande root --- */
+/* --- Add model command to root --- */
 func init() {
 	rootCmd.AddCommand(ModelCmd)
 }

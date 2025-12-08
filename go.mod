@@ -3,6 +3,7 @@ module github.com/goyourt/yogourt-cli
 go 1.24.0
 
 replace github.com/goyourt/yogourt-cli => ../yogourt-cli //dev
+replace github.com/goyourt/yogourt => ../yogourt //dev
 
 require (
 	github.com/fatih/color v1.18.0

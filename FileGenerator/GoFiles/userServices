@@ -1,13 +1,13 @@
 package services
 
 import (
-	"github.com/goyourt/yogourt/services"
+	"github.com/goyourt/yogourt/services/providers"
 
 	"$ProjectName$/models"
 )
 
 func GetCurrentUser(tokenString string) models.User {
-	db := services.GetDB()
+	db := providers.GetDB()
 	var token models.Token
 	db.Preload("Security.User").
 		Where("tokens.token = ?", tokenString).

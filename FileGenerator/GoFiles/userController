@@ -1,55 +1,85 @@
 package controllers
 
 import (
-	"context"
 	"fmt"
 
-	"github.com/goyourt/yogourt/services"
-	"gorm.io/gorm"
-
 	"$ProjectName$/models"
+
+	"github.com/gin-gonic/gin"
+	"github.com/goyourt/yogourt/services"
+	"github.com/goyourt/yogourt/services/database"
+	"github.com/goyourt/yogourt/services/providers"
 )
 
 func VerifyCredentials(username string, password string) (models.User, error) {
-	var security models.Security
-	db := services.GetDB()
+	var user models.User
+	database.GetOneBy(&user, map[string]any{"username": username})
 
-	err := db.Joins("User").
-		Where(`"User".username = ?`, username).
-		First(&security).Error
-
-	if err != nil {
-		return models.User{}, fmt.Errorf("user not found")
+	if user.GetID() == 0 {
+		return user, fmt.Errorf("user not found")
 	}
 
 	failures, err := services.GetPasswordFailureCount(username)
 	if err != nil {
-		return models.User{}, fmt.Errorf("Failed to access cache for user %s", username)
+		return user, fmt.Errorf("Failed to access cache for user %s", username)
 	}
 	if failures >= 5 {
-		return models.User{}, fmt.Errorf("too many login attempts, please try again later")
+		return user, fmt.Errorf("too many login attempts, please try again later")
 	}
 
-	if !security.CompareHash(password) {
+	if !user.GetSecurity().CompareHash(password) {
 		services.SavePasswordFailure(username)
-		return models.User{}, fmt.Errorf("invalid credentials")
+		return user, fmt.Errorf("invalid credentials")
 	}
 
-	return security.User, err
+	return user, err
 }
 
-func CreateUser(user models.User, password string) (models.User, error) {
-	db := services.GetDB()
-	ctx := context.Background()
-	security := models.Security{
-		User: user,
-	}
+func CreateUser(c *gin.Context, username string, password string) (models.User, error) {
+	dw := database.CreateDataWriter(c)
+	security := models.Security{}
 	err := security.SetHash(password)
 	if err != nil {
 		return models.User{}, err
 	}
+	err = dw.Create(&security)
 
-	err = gorm.G[models.Security](db, gorm.WithResult()).Create(ctx, &security)
+	user := models.User{
+		Username: username,
+		Security: &security,
+	}
+	err = dw.Create(&user)
+	if err != nil {
+		return user, err
+	}
 
-	return security.User, err
+	return user, err
+}
+
+func IsExistingUsername(username string) bool {
+	var user models.User
+	database.GetOneBy(&user, map[string]any{"username": username})
+	return user.GetID() != 0
+}
+
+func UpdatePassword(c *gin.Context, password string, newPassword string) error {
+	dw := database.CreateDataWriter(c)
+	value := providers.GetCurrentUser(c)
+	if value == nil {
+		return fmt.Errorf("user not found")
+	}
+	user := value.(*models.User)
+	security := user.GetSecurity()
+
+	_, err := VerifyCredentials(user.GetUsername(), password)
+	if err != nil {
+		return err
+	}
+
+	err = security.SetHash(newPassword)
+	if err != nil {
+		return err
+	}
+	err = dw.Update(security)
+	return err
 }
