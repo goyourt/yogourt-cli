@@ -9,31 +9,41 @@ import (
 
 type User struct {
 	interfaces.Base
-	Security   *Security `json:"-" gorm:"foreignKey:SecurityId; references:ID;"`
-	SecurityId int       `json:"-" gorm:"unique; default:null"`
-	Username   string    `json:"username"`
+	Security         *Security `json:"-" gorm:"foreignKey:SecurityId; references:ID;"`
+	SecurityId       *int      `json:"-" gorm:"unique; default:null"`
+	Username         *string   `json:"username"`
 }
 
 func (u *User) GetUsername() string {
-	return u.Username
+	if nil == u.Username {
+		return ""
+	}
+	return *u.Username
 }
 
 func (u *User) SetUsername(Username string) error {
 	if len(Username) == 0 {
 		return fmt.Errorf("Username cannot be empty")
 	}
-	u.Username = Username
+	if nil == u.Username {
+		u.Username = new(string)
+	}
+	*u.Username = Username
 	return nil
 }
 
 func (u *User) GetSecurity() *Security {
-	database.HydrateRelation(u, "Security", u.Security, u.SecurityId)
+	if nil == u.SecurityId {
+		u.SecurityId = new(int)
+	}
+	database.HydrateRelation(u, "Security", u.Security, *u.SecurityId)
 	return u.Security
 }
 func (u *User) SetSecurity(Security *Security) error {
-	if Security == nil {
+	if Security.GetID() == 0 {
 		return fmt.Errorf("Security cannot be nil")
 	}
 	u.Security = Security
+	*u.SecurityId = Security.GetID()
 	return nil
 }

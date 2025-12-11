@@ -45,10 +45,7 @@ func initAuth() {
 	tokenControllerFile, tokenControllerContent := controllerFolder+"tokenController.go", FileGenerator.GetComplexFileStr("tokenController", projectNameInterface)
 	userControllerFile, userControllerContent := controllerFolder+"userController.go", FileGenerator.GetComplexFileStr("userController", projectNameInterface)
 
-	serviceFolder := "./services/"
-	userServicesFile, userServicesContent := serviceFolder+"userServices.go", FileGenerator.GetComplexFileStr("userServices", projectNameInterface)
-
-	middlewareFile, middlewareFileContent := "./middleware/middleware.go", FileGenerator.GetFileStr("middlewares")
+	middlewareFile, middlewareFileContent := "./middleware/middleware.go", FileGenerator.GetFileStr("authMiddlewares")
 
 	services.GenerateFile(roleFile, roleContent)
 	services.GenerateFile(securityFile, securityContent)
@@ -67,9 +64,6 @@ func initAuth() {
 
 	services.GenerateFile(tokenControllerFile, tokenControllerContent)
 	services.GenerateFile(userControllerFile, userControllerContent)
-
-	services.CreateFolder(serviceFolder)
-	services.GenerateFile(userServicesFile, userServicesContent)
 
 	services.GenerateFile(middlewareFile, middlewareFileContent)
 }

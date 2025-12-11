@@ -16,7 +16,7 @@ func CreateToken(c *gin.Context, user models.User) (models.Token, error) {
 
 	token := models.Token{
 		Security: user.GetSecurity(),
-		Token:    tokenString,
+		Token:    &tokenString,
 	}
 	err = database.CreateDataWriter(c).Create(&token)
 

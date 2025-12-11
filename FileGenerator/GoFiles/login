@@ -1,6 +1,7 @@
 package main
 
 import (
+    "fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -22,7 +23,7 @@ func POST(c *gin.Context) {
 
 	user, err := controllers.VerifyCredentials(req.Username, req.Password)
 	if err != nil {
-		routing.RespondAndAbort(c, http.StatusUnauthorized, err.Error())
+        routing.RespondAndAbort(c, http.StatusUnauthorized, fmt.Errorf("invalid credentials").Error())
 		return
 	}
 

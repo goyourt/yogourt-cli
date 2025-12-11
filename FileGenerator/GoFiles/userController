@@ -27,10 +27,18 @@ func VerifyCredentials(username string, password string) (models.User, error) {
 		return user, fmt.Errorf("too many login attempts, please try again later")
 	}
 
-	if !user.GetSecurity().CompareHash(password) {
-		services.SavePasswordFailure(username)
-		return user, fmt.Errorf("invalid credentials")
-	}
+	security := user.GetSecurity()
+    if nil == security {
+        return user, fmt.Errorf("deleted user")
+    }
+
+    if !security.CompareHash(password) {
+        err := services.SavePasswordFailure(username)
+        if err != nil {
+            return user, err
+        }
+        return user, fmt.Errorf("invalid credentials")
+    }
 
 	return user, err
 }
@@ -45,7 +53,7 @@ func CreateUser(c *gin.Context, username string, password string) (models.User, 
 	err = dw.Create(&security)
 
 	user := models.User{
-		Username: username,
+		Username: &username,
 		Security: &security,
 	}
 	err = dw.Create(&user)

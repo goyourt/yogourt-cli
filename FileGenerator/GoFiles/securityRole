@@ -1,9 +1,9 @@
 package models
 
 type SecurityRole struct {
-	SecurityId int       `gorm:"primaryKey;not null" json:"-"`
+	SecurityId *int      `gorm:"primaryKey;not null" json:"-"`
 	Security   *Security `gorm:"foreignKey:SecurityId; references:ID; constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"security"`
-	RoleId     int       `gorm:"primaryKey;not null" json:"-"`
+	RoleId     *int      `gorm:"primaryKey;not null" json:"-"`
 	Role       *Role     `gorm:"foreignKey:RoleId; references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"role"`
 }
 
@@ -11,8 +11,9 @@ func (u *SecurityRole) GetSecurity() *Security {
 	return u.Security
 }
 
-func (u *SecurityRole) SetSecurity(Security Security) error {
-	u.Security = &Security
+func (u *SecurityRole) SetSecurity(Security *Security) error {
+	u.Security = Security
+	*u.SecurityId = Security.GetID()
 	return nil
 }
 
@@ -20,7 +21,8 @@ func (u *SecurityRole) GetRole() *Role {
 	return u.Role
 }
 
-func (u *SecurityRole) SetRole(Role Role) error {
-	u.Role = &Role
+func (u *SecurityRole) SetRole(Role *Role) error {
+	u.Role = Role
+	*u.RoleId = Role.GetID()
 	return nil
 }

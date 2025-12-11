@@ -8,7 +8,7 @@ import (
 
 type Security struct {
 	interfaces.Base
-	Hash string `gorm:"not null" json:"hash"`
+	Hash      *string `gorm:"not null" json:"-"`
 }
 
 func (u *Security) SetHash(pwd string) error {
@@ -16,11 +16,14 @@ func (u *Security) SetHash(pwd string) error {
 	if err != nil {
 		return err
 	}
-	u.Hash = hash
+	if nil == u.Hash {
+		u.Hash = new(string)
+	}
+	*u.Hash = hash
 	return nil
 }
 
 func (u *Security) CompareHash(pwd string) bool {
-	err := bcrypt.CompareHashAndPassword([]byte(u.Hash), []byte(pwd))
+	err := bcrypt.CompareHashAndPassword([]byte(*u.Hash), []byte(pwd))
 	return err == nil
 }
