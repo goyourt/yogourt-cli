@@ -2,34 +2,46 @@ package models
 
 import (
 	"fmt"
+
+	"github.com/goyourt/yogourt/interfaces"
+	"github.com/goyourt/yogourt/services/database"
 )
 
 type Token struct {
-	ID         int      `gorm:"primaryKey;autoIncrement;not null;unique" json:"id"`
-	SecurityId int      `gorm:"not null" json:"-"`
-	Security   Security `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"-"`
-	Token      string   `gorm:"not null" json:"Token"`
+	interfaces.Base
+	SecurityId *int      `gorm:"not null" json:"-"`
+	Security   *Security `gorm:"foreignKey:SecurityId; references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"-"`
+	Token      *string   `gorm:"not null" json:"token"`
 }
 
-// Champ Security
-func (u *Token) GetSecurity() Security {
+func (u *Token) GetSecurity() *Security {
+	if nil == u.SecurityId {
+		u.SecurityId = new(int)
+	}
+	database.HydrateRelation(u, "Security", u.Security, *u.SecurityId)
 	return u.Security
 }
 
-func (u *Token) SetSecurity(Security Security) error {
+func (u *Token) SetSecurity(Security *Security) error {
 	u.Security = Security
+	*u.SecurityId = Security.GetID()
 	return nil
 }
 
-// Champ Token
 func (u *Token) GetToken() string {
-	return u.Token
+	if nil == u.Token {
+		return ""
+	}
+	return *u.Token
 }
 
 func (u *Token) SetToken(Token string) error {
 	if len(Token) == 0 {
-		return fmt.Errorf("Le champ ne peut pas être vide")
+		return fmt.Errorf("This field cannot be empty")
 	}
-	u.Token = Token
+	if nil == u.Token {
+		u.Token = new(string)
+	}
+	*u.Token = Token
 	return nil
 }

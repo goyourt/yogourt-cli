@@ -1,0 +1,51 @@
+package controllers
+
+import (
+	"fmt"
+
+	"$ProjectName$/models"
+
+	"github.com/gin-gonic/gin"
+	"github.com/goyourt/yogourt/interfaces"
+	"github.com/goyourt/yogourt/services"
+	"github.com/goyourt/yogourt/services/database"
+)
+
+func GetFile(uuid string) (interfaces.FileInterface, error) {
+	var file models.File
+	database.GetOneBy(&file, map[string]any{"uuid": uuid})
+
+	if file.GetID() == 0 {
+		return &interfaces.File{}, fmt.Errorf("enable to create file")
+	}
+
+	return &file, nil
+}
+
+func CreateFile(c *gin.Context) (models.File, error) {
+	dw := database.CreateDataWriter(c)
+	var file models.File
+	fileContent, fileHeader, err := c.Request.FormFile("file")
+	if err != nil {
+		return file, fmt.Errorf("could not get form file: " + err.Error())
+	}
+
+	content, err := services.SerializeFile(fileContent)
+	if err != nil {
+		return file, err
+	}
+
+	file.SetName(fileHeader.Filename)
+	file.SetContent(content)
+
+	err = dw.Create(&file)
+
+	if err != nil {
+		return file, err
+	}
+
+	services.SaveFile(&file)
+	err = dw.Update(&file)
+
+	return file, err
+}

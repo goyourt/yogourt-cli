@@ -1,0 +1,7 @@
+package models
+
+import "github.com/goyourt/yogourt/interfaces"
+
+type File struct {
+	interfaces.File
+}
