@@ -1,10 +1,9 @@
 module github.com/goyourt/yogourt-cli
 
-go 1.24
+go 1.24.0
 
 require (
 	github.com/fatih/color v1.18.0
-	github.com/joho/godotenv v1.5.1
 	gorm.io/gorm v1.25.10
 )
 
@@ -28,6 +27,7 @@ require (
 
 require (
 	github.com/AlecAivazis/survey/v2 v2.3.7
+	github.com/goyourt/yogourt-compiler v0.0.0
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
@@ -37,3 +37,5 @@ require (
 	gopkg.in/yaml.v2 v2.4.0
 	gorm.io/driver/postgres v1.5.11
 )
+
+replace github.com/goyourt/yogourt-compiler => ../yogourt-compiler

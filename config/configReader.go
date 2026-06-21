@@ -32,6 +32,7 @@ type Config struct {
 		ProjectName string `yaml:"project_name"`
 		MainFile    string `yaml:"main_file"`
 		RouteFolder string `yaml:"route_folder"`
+		APIFolder   string `yaml:"api_folder"`
 	} `yaml:"paths"`
 }
 
