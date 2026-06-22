@@ -4,6 +4,7 @@ go 1.24.0
 
 require (
 	github.com/fatih/color v1.18.0
+	github.com/joho/godotenv v1.5.1
 	gorm.io/gorm v1.25.10
 )
 
