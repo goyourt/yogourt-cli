@@ -18,8 +18,8 @@ var devNoInitialBuild bool
 
 var DevCmd = &cobra.Command{
 	Use:   "dev",
-	Short: "Lance Yogourt en mode développement",
-	Long:  "Compile les plugins Yogourt, lance le runtime web, watch les changements, puis rebuild/restart en développement.",
+	Short: "Run Yogourt in development mode",
+	Long:  "Compile the Yogourt plugins, start the web runtime, watch for changes, then rebuild and restart on every change.",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		runtimeCommand := yogourtcompiler.GoRunCommand(".")
 		if devRuntimeCommand != "" {
@@ -29,7 +29,7 @@ var DevCmd = &cobra.Command{
 			runtimeCommand = args
 		}
 		if len(runtimeCommand) == 0 {
-			return errors.New("commande runtime vide")
+			return errors.New("runtime command is empty")
 		}
 
 		cfg, cfgPath, err := compilerConfig(runtimeCommand)
@@ -94,11 +94,11 @@ func loadProjectConfig() (*config.Config, string, error) {
 		}
 	}
 
-	return nil, "", fmt.Errorf("❌ Fichier config Yogourt introuvable: attendu %s ou %s", candidates[0], candidates[1])
+	return nil, "", fmt.Errorf("❌ Yogourt config file not found: expected %s or %s", candidates[0], candidates[1])
 }
 
 func init() {
-	DevCmd.Flags().StringVar(&devRuntimeCommand, "runtime", "", "Commande runtime à lancer, par défaut: go run .")
-	DevCmd.Flags().BoolVar(&devNoInitialBuild, "no-initial-build", false, "Lance le runtime sans rebuild initial des plugins")
+	DevCmd.Flags().StringVar(&devRuntimeCommand, "runtime", "", "Runtime command to run (default: go run .)")
+	DevCmd.Flags().BoolVar(&devNoInitialBuild, "no-initial-build", false, "Start the runtime without rebuilding the plugins first")
 	rootCmd.AddCommand(DevCmd)
 }

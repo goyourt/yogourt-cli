@@ -11,8 +11,8 @@ import (
 /* Commande init */
 var InitCmd = &cobra.Command{
 	Use:   "init [projectName]",
-	Short: "Initialise un nouveau projet yogourt",
-	Long:  "Crée la structure de base pour un nouveau projet yogourt",
+	Short: "Initialize a new Yogourt project",
+	Long:  "Create the base structure of a new Yogourt project",
 	Args:  cobra.ExactArgs(1), //Attends un seul argument
 	Run: func(cmd *cobra.Command, args []string) {
 		ProjectName := args[0]

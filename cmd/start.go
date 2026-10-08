@@ -15,8 +15,8 @@ var startRuntimeCommand string
 
 var StartCmd = &cobra.Command{
 	Use:   "start",
-	Short: "Lance le runtime Yogourt",
-	Long:  "Lance le runtime web Yogourt sans compiler les plugins et sans watcher.",
+	Short: "Start the Yogourt runtime",
+	Long:  "Start the Yogourt web runtime without compiling the plugins and without watching for changes.",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		runtimeCommand := yogourtcompiler.GoRunCommand(".")
 		if startRuntimeCommand != "" {
@@ -26,7 +26,7 @@ var StartCmd = &cobra.Command{
 			runtimeCommand = args
 		}
 		if len(runtimeCommand) == 0 {
-			return errors.New("commande runtime vide")
+			return errors.New("runtime command is empty")
 		}
 
 		cfg, cfgPath, err := compilerConfig(runtimeCommand)
@@ -50,6 +50,6 @@ var StartCmd = &cobra.Command{
 }
 
 func init() {
-	StartCmd.Flags().StringVar(&startRuntimeCommand, "runtime", "", "Commande runtime à lancer, par défaut: go run .")
+	StartCmd.Flags().StringVar(&startRuntimeCommand, "runtime", "", "Runtime command to run (default: go run .)")
 	rootCmd.AddCommand(StartCmd)
 }

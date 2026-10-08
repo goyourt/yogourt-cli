@@ -15,8 +15,8 @@ import (
 /* Commande Migration */
 var MigrationCmd = &cobra.Command{
 	Use:   "migrate [modelName]",
-	Short: "Effectue une migration d'un modele",
-	Long:  "Effectue une migration d'un modele vers la base de données configurée",
+	Short: "Migrate a model",
+	Long:  "Migrate a model to the configured database",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		modelName := args[0]

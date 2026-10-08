@@ -11,8 +11,8 @@ import (
 
 var BuildCmd = &cobra.Command{
 	Use:   "build",
-	Short: "Compile tous les plugins Yogourt",
-	Long:  "Rebuild tous les plugins Yogourt vers le dossier .yogourt.",
+	Short: "Compile all Yogourt plugins",
+	Long:  "Rebuild all Yogourt plugins into the .yogourt folder.",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cfg, cfgPath, err := compilerConfig(nil)
 		if err != nil {

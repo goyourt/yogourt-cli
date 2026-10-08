@@ -21,8 +21,8 @@ import (
 /* Commande Model */
 var ModelCmd = &cobra.Command{
 	Use:   "model",
-	Short: "Crée un modèle",
-	Long:  "Crée un modèle de table lié à la base de données",
+	Short: "Create a model",
+	Long:  "Create a table model bound to the database",
 	Run: func(cmd *cobra.Command, args []string) {
 		CreateModel()
 	},
