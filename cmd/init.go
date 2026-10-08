@@ -71,7 +71,7 @@ paths:
   model_folder: "./models/"
   project_name: ` + ProjectName + `
   main_file: "./main.go"
-  api_folder: "./api/"
+  route_folder: "api"
 `
 
 	file.WriteString(configFileContent) //Ecriture du contenu dans le fichier config

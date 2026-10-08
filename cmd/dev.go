@@ -55,12 +55,9 @@ func compilerConfig(runtimeCommand []string) (yogourtcompiler.Config, string, er
 		return yogourtcompiler.Config{}, "", err
 	}
 
-	routeFolder := cfg.Paths.APIFolder
+	routeFolder := cfg.Paths.RouteFolder
 	if routeFolder == "" {
-		routeFolder = cfg.Paths.RouteFolder
-	}
-	if routeFolder == "" {
-		routeFolder = "api"
+		routeFolder = yogourtcompiler.DefaultRouteFolder
 	}
 	routeFolder = strings.Trim(routeFolder, "./")
 
