@@ -14,6 +14,10 @@ var BuildCmd = &cobra.Command{
 	Short: "Compile all Yogourt plugins",
 	Long:  "Rebuild all Yogourt plugins into the .yogourt folder.",
 	RunE: func(cmd *cobra.Command, args []string) error {
+		if err := disablePluginDwarfOnDarwin(); err != nil {
+			return err
+		}
+
 		cfg, cfgPath, err := compilerConfig(nil)
 		if err != nil {
 			return err

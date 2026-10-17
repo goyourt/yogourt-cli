@@ -32,6 +32,10 @@ var DevCmd = &cobra.Command{
 			return errors.New("runtime command is empty")
 		}
 
+		if err := disablePluginDwarfOnDarwin(); err != nil {
+			return err
+		}
+
 		cfg, cfgPath, err := compilerConfig(runtimeCommand)
 		if err != nil {
 			return err
