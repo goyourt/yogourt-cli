@@ -11,6 +11,7 @@ import (
 	"unicode"
 
 	"github.com/goyourt/yogourt-cli/FileGenerator"
+	"github.com/goyourt/yogourt/services/providers"
 
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/fatih/color"

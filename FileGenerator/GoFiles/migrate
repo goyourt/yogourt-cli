@@ -1,0 +1,11 @@
+package main
+
+import "os"
+
+var Up = map[string]func(){}
+
+var Down = map[string]func(){}
+
+func main() {
+	migrations.Migrate(Up, Down, os.Args[1:])
+}
