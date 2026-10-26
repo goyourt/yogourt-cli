@@ -5,6 +5,7 @@ mode: "development"
 
 server:
   port: 8080
+  host: "localhost"
   cors: true
 
 database:
@@ -14,14 +15,17 @@ database:
   host: "localhost"
   port: 5432
   db: "mydb"
+  allow_insecure_loopback: true
+  ssl_mode: "disable"
 
 cache:
   host: "localhost"
-  port: 6379
+  port: "6379"
   password: "cache-key"
   db: 0
 
 paths:
+  route_folder: "./api/"
   model_folder: "./models/"
   project_name: "$ProjectName$"
   main_file: "./main.go"
@@ -29,4 +33,7 @@ paths:
 
 security:
   secret_key: "supersecret"
-  token_expires: 1440 # one day
+  token_expires: 1440 # one day, in minutes
+
+cors:
+  allow_all_origins: true
