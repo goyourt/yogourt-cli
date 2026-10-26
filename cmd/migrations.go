@@ -13,8 +13,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var upMapRegex = regexp.MustCompile(`var Up = map\[string\]func\(\)\{[^}]*\}`)
-var downMapRegex = regexp.MustCompile(`var Down = map\[string\]func\(\)\{[^}]*\}`)
+var upMapRegex = regexp.MustCompile(`var Up = map\[string\]func\(\*gorm\.DB\)\{[^}]*\}`)
+var downMapRegex = regexp.MustCompile(`var Down = map\[string\]func\(\*gorm\.DB\)\{[^}]*\}`)
 const migrationFolder = "./migrations/"
 
 

@@ -2,12 +2,14 @@ package main
 
 import (
 	"github.com/goyourt/yogourt/migrations"
+	"gorm.io/gorm"
+
 	"os"
 )
 
-var Up = map[string]func(){}
+var Up = map[string]func(*gorm.DB){}
 
-var Down = map[string]func(){}
+var Down = map[string]func(*gorm.DB){}
 
 func main() {
 	migrations.Migrate(Up, Down, os.Args[1:])
