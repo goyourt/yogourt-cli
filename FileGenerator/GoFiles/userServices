@@ -1,0 +1,17 @@
+package services
+
+import (
+	"github.com/goyourt/yogourt/services"
+
+	"$ProjectName$/models"
+)
+
+func GetCurrentUser(tokenString string) models.User {
+	db := services.GetDB()
+	var token models.Token
+	db.Preload("Security.User").
+		Where("tokens.token = ?", tokenString).
+		First(&token)
+
+	return token.Security.User
+}

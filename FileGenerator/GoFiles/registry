@@ -1,0 +1,9 @@
+package models
+
+var Models = map[string]interface{}{
+	"Role":         Role{},
+	"User":         User{},
+	"Token":        Token{},
+	"Security":     Security{},
+	"SecurityRole": SecurityRole{},
+}

@@ -5,21 +5,26 @@ import (
 	"log"
 	"os"
 
+	"github.com/goyourt/yogourt-cli/FileGenerator"
 	"github.com/spf13/cobra"
 )
 
+var projectNameInterface map[string]string
+
 /* Commande init */
-var InitCmd = &cobra.Command{
+var initCmd = &cobra.Command{
 	Use:   "init [projectName]",
 	Short: "Initialize a new Yogourt project",
 	Long:  "Create the base structure of a new Yogourt project",
 	Args:  cobra.ExactArgs(1), //Attends un seul argument
 	Run: func(cmd *cobra.Command, args []string) {
-		ProjectName := args[0]
+		projectName := args[0]
 
-		CreateConfigFile(ProjectName)
-		InitProject(ProjectName)
-		createMiddlewareFile(ProjectName)
+		projectNameInterface = map[string]string{"ProjectName": projectName}
+		createConfigFile()
+		initProject(projectName)
+		createMiddlewareFile()
+		initAuth()
 	},
 }
 
@@ -34,226 +39,113 @@ func InitLogsFile() {
 }
 
 /* --- Création du fichier config --- */
-func CreateConfigFile(ProjectName string) {
+func createConfigFile() {
 
 	// Initialisation du fichier de logs
 	InitLogsFile()
 
 	configPath := "./config.yaml"
+	configFileContent := FileGenerator.GetComplexFileStr("config", projectNameInterface)
 
-	// Création du fichier config
-	file, configFileError := os.Create(configPath)
-	if configFileError != nil {
-		log.Printf("ERROR: %s\n", configFileError) // Ecriture des logs
-		log.Fatalf("Erreur lors de la création du fichier de config: %v\n", configFileError)
-		return
-	}
-	defer file.Close()
-
-	configFileContent := `
-app_name: "` + ProjectName + `"
-version: "1.0.0"
-mode: "development"
-
-server:
-  port: 8080
-  cors: true
-
-database:
-  type: "postgres"
-  user: "admin"
-  password: "password"
-  host: "localhost"
-  port: 5432
-  dbname: "mydb"
-
-paths:
-  model_folder: "./models/"
-  project_name: ` + ProjectName + `
-  main_file: "./main.go"
-  route_folder: "api"
-`
-
-	file.WriteString(configFileContent) //Ecriture du contenu dans le fichier config
+	FileGenerator.GenerateFile(configPath, configFileContent)
 }
 
 /* --- Fin création du fichier config --- */
 
 /* --- Création du fichier middleware --- */
-func createMiddlewareFile(ProjectName string) {
-
-	// Initialisation du fichier de logs
+func createMiddlewareFile() {
 	InitLogsFile()
 
-	/* Dossier middleware - présent dans le dossier principal */
-	MiddlewareFolder := "./middleware/"
-
-	middlewareFolderError := os.Mkdir(MiddlewareFolder, os.ModePerm)
-
-	if middlewareFolderError != nil {
-		fmt.Printf("Erreur lors de la création du dossier middleware: %v \n", middlewareFolderError)
-		log.Printf("ERROR: %s\n", middlewareFolderError) // Ecriture des logs
-		return
-	}
+	middlewareFolder := "./middleware/"
+	FileGenerator.CreateFolder(middlewareFolder)
 
 	//Création du fichier middleware
-	MiddlewareFile := MiddlewareFolder + "middleware.go"
+	middlewareFile := middlewareFolder + "middleware.go"
+	middlewareFileContent := FileGenerator.GetFileStr("middlewares")
 
-	file, middlewareFileError := os.Create(MiddlewareFile)
-	if middlewareFileError != nil {
-		fmt.Printf("Erreur lors de la création du fichier middleware: %v \n", middlewareFileError)
-		log.Printf("ERROR: %s\n", middlewareFileError) // Ecriture des logs
-		return
-	}
-	defer file.Close() //Fermeture du fichier config
-
-	middlewareFileContent := `package main
-
-import (
-	"github.com/gin-gonic/gin"
-)
-
-var Callbacks = map[string]func(*gin.Context){
-	"/api":          base,
-}
-
-func base(c *gin.Context) {
-	c.Next()
-}
-
-func main() {}
-`
-
-	file.WriteString(middlewareFileContent) //Ecriture du contenu dans le fichier middleware
+	FileGenerator.GenerateFile(middlewareFile, middlewareFileContent)
 }
 
 /* --- Fin création du fichier middleware --- */
 
 /* --- Fonction pour la commande "init" du package --- */
-func InitProject(ProjectName string) {
-
-	// Initialisation du fichier de logs
+func initProject(projectName string) {
 	InitLogsFile()
 
-	/* Dossier route - présent dans le dossier principal */
-	ApiFolder := "./api/"
+	FileGenerator.CreateFolder("./api/")
 
-	apiFolderError := os.Mkdir(ApiFolder, os.ModePerm)
-
-	if apiFolderError != nil {
-		fmt.Printf("Erreur lors de la création du dossier api: %v \n", apiFolderError)
-		log.Printf("ERROR: %s\n", apiFolderError) // Ecriture des logs
-		return
-	}
-
-	/* Dossier model - présent dans le dossier principal */
-	ModelFolder := "./models/"
-
-	modelFolderError := os.Mkdir(ModelFolder, os.ModePerm)
-
-	if modelFolderError != nil {
-		fmt.Printf("Erreur lors de la création du dossier models: %v \n", modelFolderError)
-		log.Printf("ERROR: %s\n", modelFolderError) // Ecriture des logs
-		return
-	}
+	modelFolder := "./models/"
+	FileGenerator.CreateFolder(modelFolder)
 
 	/* Fichier modelRegistry - présent dans le dossier models */
-	ModelRegistryFile := ModelFolder + "registry.go"
+	modelRegistryFile := modelFolder + "registry.go"
+	registryFileContent := FileGenerator.GetFileStr("registry")
 
-	file, modelRegistryError := os.Create(ModelRegistryFile)
-
-	if modelRegistryError != nil {
-		fmt.Printf("Erreur lors de la création du fichier models/registry.go: %v \n", modelRegistryError)
-		log.Printf("ERROR: %s\n", modelRegistryError) // Ecriture des logs
-		return
-	}
-	defer file.Close() //Fermeture du fichier registry.go
-
-	registryFileContent := `package models
-
-var Models = map[string]interface{}{
-}
-`
-
-	file.WriteString(registryFileContent) //Ecriture du contenu dans le fichier registry.go
+	FileGenerator.GenerateFile(modelRegistryFile, registryFileContent)
 
 	/* --- Création du fichier cmd/migrate.go --- */
 	/* Dossier cmd */
-	CmdFolder := "./cmd/"
-
-	cmdFolderError := os.Mkdir(CmdFolder, os.ModePerm)
-
-	if cmdFolderError != nil {
-		fmt.Printf("Erreur lors de la création du dossier cmd: %v \n", cmdFolderError)
-		log.Printf("ERROR: %s\n", cmdFolderError) // Ecriture des logs
-		return
-	}
+	cmdFolder := "./cmd/"
+	FileGenerator.CreateFolder(cmdFolder)
 
 	/* Fichier migrate.go */
-	MigrateFile := CmdFolder + "/migrate.go"
+	migrateFile := cmdFolder + "/migrate.go"
+	migrationFileContent := FileGenerator.GetComplexFileStr("migration", projectNameInterface)
 
-	file, migrateFileError := os.Create(MigrateFile)
-	if migrateFileError != nil {
-		fmt.Printf("Erreur lors de la création du fichier migrate: %v \n", migrateFileError)
-		log.Printf("ERROR: %s\n", migrateFileError) // Ecriture des logs
-		return
-	}
-	defer file.Close() //Fermeture du fichier migrate
+	FileGenerator.GenerateFile(migrateFile, migrationFileContent)
 
-	migrationFileContent := `package main
-
-import (
-	"log"
-
-	"github.com/goyourt/yogourt-cli/database"
-	 ` + ProjectName + ` "/models"
-)
-
-func main() {
-	// Initialisation de la base de données
-	database.InitDatabase("../config.yaml")
-
-	for name, model := range models.Models {
-		if err := database.DB.AutoMigrate(model); err != nil {
-			log.Printf("❌ Échec de la migration du modèle '%s': %v", name, err)
-		} else {
-			log.Printf("✅ Migration réussie pour le modèle '%s'", name)
-		}
-	}
-}
-`
-	file.WriteString(migrationFileContent) //Ecriture du contenu dans le fichier migrate.go
+	/* docker-compose */
+	dockerComposeFileContent := FileGenerator.GetComplexFileStr("docker-compose", projectNameInterface)
+	FileGenerator.GenerateFile("./docker-compose.yml", dockerComposeFileContent)
 
 	/* Fichier main - présent dans le dossier principal */
-	MainFile := "./main.go"
-
-	file, mainFileError := os.Create(MainFile)
-	if mainFileError != nil {
-		fmt.Printf("Erreur lors de la création du fichier main: %v \n", mainFileError)
-		log.Printf("ERROR: %s\n", mainFileError) // Ecriture des logs
-		return
-	}
-	defer file.Close() //Fermeture du fichier main
-
-	mainFileContent := `package main
-
-import (
-	// Imports
-)
-
-func main() {
-	/* Bienvenue sur yogourt ! */
-}
-`
-	file.WriteString(mainFileContent) //Ecriture du contenu dans le fichier main.go
+	mainFileContent := FileGenerator.GetFileStr("main")
+	FileGenerator.GenerateFile("./main.go", mainFileContent)
 
 	fmt.Println("L'environnement a été initialisé avec succès.")
 
 	/* --- Ecriture des logs --- */
-	log.Printf("Environnement initialisé avec succès: %s\n", ProjectName)
+	log.Printf("Environnement initialisé avec succès: %s\n", projectName)
+}
+
+func initAuth() {
+	modelFolder := "./models/"
+	roleFile, roleContent := modelFolder+"Role.go", FileGenerator.GetFileStr("role")
+	securityFile, securityContent := modelFolder+"Security.go", FileGenerator.GetFileStr("security")
+	securityRoleFile, securityRoleContent := modelFolder+"SecurityRole.go", FileGenerator.GetFileStr("securityRole")
+	tokenFile, tokenContent := modelFolder+"Token.go", FileGenerator.GetFileStr("token")
+	userFile, userContent := modelFolder+"User.go", FileGenerator.GetFileStr("user")
+
+	routesFolder := "./api/auth/"
+	loginFile, loginContent := routesFolder+"login/login.go", FileGenerator.GetComplexFileStr("login", projectNameInterface)
+	signupFile, signupContent := routesFolder+"signup/signup.go", FileGenerator.GetComplexFileStr("signup", projectNameInterface)
+
+	controllerFolder := "./controllers/"
+	tokenControllerFile, tokenControllerContent := controllerFolder+"tokenController.go", FileGenerator.GetComplexFileStr("tokenController", projectNameInterface)
+	userControllerFile, userControllerContent := controllerFolder+"userController.go", FileGenerator.GetComplexFileStr("userController", projectNameInterface)
+
+	serviceFolder := "./services/"
+	userServicesFile, userServicesContent := serviceFolder+"userServices.go", FileGenerator.GetComplexFileStr("userServices", projectNameInterface)
+
+	FileGenerator.GenerateFile(roleFile, roleContent)
+	FileGenerator.GenerateFile(securityFile, securityContent)
+	FileGenerator.GenerateFile(securityRoleFile, securityRoleContent)
+	FileGenerator.GenerateFile(tokenFile, tokenContent)
+	FileGenerator.GenerateFile(userFile, userContent)
+
+	FileGenerator.CreateFolder(routesFolder)
+	FileGenerator.CreateFolder(routesFolder + "login")
+	FileGenerator.CreateFolder(routesFolder + "signup")
+	FileGenerator.GenerateFile(loginFile, loginContent)
+	FileGenerator.GenerateFile(signupFile, signupContent)
+	FileGenerator.CreateFolder(controllerFolder)
+	FileGenerator.GenerateFile(tokenControllerFile, tokenControllerContent)
+	FileGenerator.GenerateFile(userControllerFile, userControllerContent)
+	FileGenerator.CreateFolder(serviceFolder)
+	FileGenerator.GenerateFile(userServicesFile, userServicesContent)
 }
 
 /* --- Ajout de la commande init à la commande root --- */
 func init() {
-	rootCmd.AddCommand(InitCmd)
+	rootCmd.AddCommand(initCmd)
 }

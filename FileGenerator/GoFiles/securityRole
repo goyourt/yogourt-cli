@@ -1,0 +1,24 @@
+package models
+
+type SecurityRole struct {
+	SecurityId int      `gorm:"primaryKey;not null" json:"security_id"`
+	Security   Security `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"security"`
+	RoleId     int      `gorm:"primaryKey;not null" json:"role_id"`
+	Role       Role     `gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"role"`
+}
+
+func (u *SecurityRole) GetSecurity() Security { return u.Security }
+
+func (u *SecurityRole) SetSecurity(Security Security) error {
+	u.Security = Security
+	return nil
+}
+
+func (u *SecurityRole) GetRole() Role {
+	return u.Role
+}
+
+func (u *SecurityRole) SetRole(Role Role) error {
+	u.Role = Role
+	return nil
+}
