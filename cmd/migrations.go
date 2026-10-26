@@ -38,6 +38,7 @@ var MigrateCmd = &cobra.Command{
 func init() {
 	rootCmd.AddCommand(CreateMigrationCmd)
 	MigrateCmd.Flags().Bool("down", false, "Run the Down function of the given migration")
+	MigrateCmd.Flags().Bool("up", false, "Run the Up function of the given migration")
 	rootCmd.AddCommand(MigrateCmd)
 	InitLogsFile()
 }
@@ -88,7 +89,19 @@ func registerMigration(timeStamp string) {
 
 func addToMigrationMap(content string, mapRegex *regexp.Regexp, entry string) string {
 	return mapRegex.ReplaceAllStringFunc(content, func(m string) string {
-		return strings.TrimSuffix(m, "}") + entry + "}"
+		braceIndex := strings.Index(m, "{")
+		header := m[:braceIndex+1]
+
+		// Normalise le corps de la map : retire la virgule finale éventuelle
+		// (gofmt peut aussi l'avoir supprimée) puis garantit le séparateur.
+		inner := strings.TrimSpace(m[braceIndex+1 : len(m)-1])
+		inner = strings.TrimSuffix(inner, ",")
+		inner = strings.TrimSpace(inner)
+		if inner != "" {
+			inner += ", "
+		}
+
+		return header + inner + entry + "}"
 	})
 }
 

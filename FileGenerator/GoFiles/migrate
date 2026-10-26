@@ -1,6 +1,9 @@
 package main
 
-import "os"
+import (
+	"github.com/goyourt/yogourt/migrations"
+	"os"
+)
 
 var Up = map[string]func(){}
 
