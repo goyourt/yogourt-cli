@@ -88,12 +88,6 @@ func initProject(projectName string) {
 	cmdFolder := "./cmd/"
 	FileGenerator.CreateFolder(cmdFolder)
 
-	/* Fichier migrate.go */
-	migrateFile := cmdFolder + "/migrate.go"
-	migrationFileContent := FileGenerator.GetComplexFileStr("migration", projectNameInterface)
-
-	FileGenerator.GenerateFile(migrateFile, migrationFileContent)
-
 	/* docker-compose */
 	dockerComposeFileContent := FileGenerator.GetComplexFileStr("docker-compose", projectNameInterface)
 	FileGenerator.GenerateFile("./docker-compose.yml", dockerComposeFileContent)

@@ -1,0 +1,7 @@
+package main
+
+func Up$timeStamp$() {
+}
+
+func Down$timeStamp$() {
+}
