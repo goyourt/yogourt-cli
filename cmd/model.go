@@ -11,7 +11,6 @@ import (
 	"unicode"
 
 	"github.com/goyourt/yogourt-cli/FileGenerator"
-	"github.com/goyourt/yogourt/services"
 
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/fatih/color"
@@ -21,8 +20,8 @@ import (
 /* Commande Model */
 var ModelCmd = &cobra.Command{
 	Use:   "model",
-	Short: "Crée un modèle",
-	Long:  "Crée un modèle de table lié à la base de données",
+	Short: "Create a model",
+	Long:  "Create a table model bound to the database",
 	Run: func(cmd *cobra.Command, args []string) {
 		CreateModel()
 	},
@@ -52,7 +51,12 @@ func CreateModel() {
 	InitLogsFile()
 
 	// Vérification et lecture du fichier config
-	cfg := services.GetConfig()
+	cfg, _, err := loadProjectConfig()
+	if err != nil {
+		log.Printf("ERROR: %s\n", err)
+		fmt.Println(err)
+		return
+	}
 
 	// Récupération de la variable d'environnement depuis le fichier config
 	ModelFolder := cfg.Paths.ModelFolder
@@ -223,7 +227,7 @@ func CreateModel() {
 	}
 
 	// Ecriture dans le fichier modele
-	_, err := modelFile.WriteString(modelFileContent)
+	_, err = modelFile.WriteString(modelFileContent)
 	if err != nil {
 		fmt.Printf("❌ Erreur d'écriture dans le fichier modèle : %v\n", err)
 		log.Printf("ERROR: %s\n", err) // Ecriture des logs

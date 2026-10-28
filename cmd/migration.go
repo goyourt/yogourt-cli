@@ -10,8 +10,8 @@ import (
 /* Commande Migration */
 var MigrationCmd = &cobra.Command{
 	Use:   "migrate",
-	Short: "Effectue une migration des modeles",
-	Long:  "Effectue une migration des modeles vers la base de donnée configurée",
+	Short: "Migrate the models",
+	Long:  "Migrate the models to the configured database",
 	Run: func(cmd *cobra.Command, args []string) {
 		migrate()
 	},

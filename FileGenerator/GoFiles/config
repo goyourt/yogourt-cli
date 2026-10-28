@@ -25,7 +25,7 @@ paths:
   model_folder: "./models/"
   project_name: "$ProjectName$"
   main_file: "./main.go"
-  api_folder: "./api/"
+  route_folder: "api"
 
 security:
   secret_key: "supersecret"
