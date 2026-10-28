@@ -11,7 +11,7 @@ import (
 	"unicode"
 
 	"github.com/goyourt/yogourt-cli/FileGenerator"
-	"github.com/goyourt/yogourt/services"
+	"github.com/goyourt/yogourt/services/providers"
 
 	"github.com/AlecAivazis/survey/v2"
 	"github.com/fatih/color"
@@ -52,7 +52,7 @@ func CreateModel() {
 	InitLogsFile()
 
 	// Vérification et lecture du fichier config
-	cfg := services.GetConfig()
+	cfg := providers.GetMainConfig()
 
 	// Récupération de la variable d'environnement depuis le fichier config
 	ModelFolder := cfg.Paths.ModelFolder

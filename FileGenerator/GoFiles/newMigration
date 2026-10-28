@@ -1,0 +1,9 @@
+package main
+
+import "gorm.io/gorm"
+
+func Up$timeStamp$(db *gorm.DB) {
+}
+
+func Down$timeStamp$(db *gorm.DB) {
+}

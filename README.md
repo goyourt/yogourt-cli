@@ -12,4 +12,4 @@ go run main.go
 
 Your yogourt app is now running at http://localhost:8080
 
-You can configure your app from the config file `config.yaml`
+You can configure your app from the config file `configs/yogourt.yaml`
