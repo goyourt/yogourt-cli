@@ -83,6 +83,7 @@ func compilerConfig(runtimeCommand []string) (yogourtcompiler.Config, string, er
 
 func loadProjectConfig() (*config.Config, string, error) {
 	candidates := []string{
+		"yogourt.yaml",
 		filepath.Join("configs", "yogourt.yaml"),
 		"config.yaml",
 	}
@@ -94,7 +95,7 @@ func loadProjectConfig() (*config.Config, string, error) {
 		}
 	}
 
-	return nil, "", fmt.Errorf("❌ Yogourt config file not found: expected %s or %s", candidates[0], candidates[1])
+	return nil, "", fmt.Errorf("❌ Yogourt config file not found: expected one of %s", strings.Join(candidates, ", "))
 }
 
 func init() {
