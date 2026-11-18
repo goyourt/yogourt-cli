@@ -4,7 +4,7 @@ go 1.24.0
 
 require (
 	github.com/fatih/color v1.18.0
-	github.com/goyourt/yogourt-compiler v0.0.0-20260630094021-552b8aced232
+	github.com/goyourt/yogourt-compiler v0.0.0-20261118093354-1590fbab9b9b
 	github.com/joho/godotenv v1.5.1
 	gopkg.in/yaml.v2 v2.4.0
 )
